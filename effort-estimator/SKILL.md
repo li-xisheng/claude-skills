@@ -182,3 +182,4 @@ AI/RAG案件额外考虑：
 `references/methods.md` — 全部 11 节：WBS/三点/类比/FP/德尔菲/三维评估/NESMA/敏捷工具箱/人性博弈/持续校正/国标GB/T 36964
 `references/japan-context.md` — 日本IT業界の見積もり慣習、単位体系、契約形態別注意点、単価相場
 `references/output-templates.md` — 各输出格式的模板（見積書/WBS表/PERT報告/一頁摘要/Phase分割/AI案件専用）
+`scripts/generate_excel.py` — 汎用 Excel 生成スクリプト。クラスベースで再利用可能、係数は参照セル方式で全自動再計算。詳細は `references/excel-quality-guide.md`
