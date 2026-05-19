@@ -100,21 +100,21 @@ class EstimateWorkbook:
 
     def _setup_sheet1_columns(self):
         widths = self.config.get('col_widths', {})
-        defaults = {'A': 6, 'B': 48, 'C': 10, 'D': 10, 'E': 10, 'F': 12, 'G': 16}
+        defaults = {'A': 6, 'B': 48, 'C': 10, 'D': 10, 'E': 10, 'F': 12, 'G': 16, 'H': 14}
         for col, w in {**defaults, **widths}.items():
             self._sheet1.column_dimensions[col].width = w
 
     def _write_sheet1_header(self):
         ws = self._sheet1
         self._setup_sheet1_columns()
-        ws.merge_cells('A1:G1')
+        ws.merge_cells('A1:H1')
         ws['A1'] = self.meta.get('title', '工数見積')
         ws['A1'].font = self.styles.TITLE_FONT
         if self.meta.get('subtitle'):
             ws.merge_cells('A2:G2')
             ws['A2'] = self.meta['subtitle']
             ws['A2'].font = self.styles.SUBTITLE_FONT
-        headers = ['ID', 'タスク', 'O (楽観)', 'M (最可能)', 'P (悲観)', 'PERT期待値', '備考']
+        headers = ['ID', 'タスク', 'O (楽観)', 'M (最可能)', 'P (悲観)', 'PERT期待値', '備考', '分散 σ²']
         for col, h in enumerate(headers, 1):
             cell = ws.cell(row=4, column=col, value=h)
             cell.font = self.styles.HEADER_FONT
@@ -158,7 +158,12 @@ class EstimateWorkbook:
                 cell = ws.cell(row=self._row, column=6, value=formula)
                 cell.font = self.styles.BOLD_FONT
                 cell.number_format = '0.00'
-                for c in range(1, 8):
+                # Subtotal variance sum
+                var_cell = ws.cell(row=self._row, column=8)
+                var_cell.value = f'=SUM(H{fr}:H{lr})'
+                var_cell.number_format = '0.0000'
+                var_cell.font = self.styles.BOLD_FONT
+                for c in range(1, 9):
                     ws.cell(row=self._row, column=c).fill = self.styles.SUBTOTAL_FILL
                     ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
                 self.subtotal_rows[letter] = self._row
@@ -177,12 +182,17 @@ class EstimateWorkbook:
             cell.number_format = '0.00'
             cell.alignment = self.styles.CENTER
             ws.cell(row=self._row, column=7, value=note)
+            # Column H: per-task variance σ² = ((P-O)/6)²
+            var_cell = ws.cell(row=self._row, column=8)
+            var_cell.value = f'=((E{self._row}-C{self._row})/6)^2'
+            var_cell.number_format = '0.0000'
+            var_cell.alignment = self.styles.CENTER
             # Track section
             sec = tid[0] if tid else ''
             if sec not in self.section_task_rows:
                 self.section_task_rows[sec] = []
             self.section_task_rows[sec].append(self._row)
-            for c in range(1, 8):
+            for c in range(1, 9):
                 ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
             self._row += 1
 
@@ -201,7 +211,7 @@ class EstimateWorkbook:
                 ws.cell(row=self._row, column=2, value=summary_labels.get(sec, sec))
                 cell = ws.cell(row=self._row, column=6, value=f'=F{self.subtotal_rows[sec]}')
                 cell.number_format = '0.00'
-                for c in range(1, 8):
+                for c in range(1, 9):
                     ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
                 self._row += 1
 
@@ -213,7 +223,7 @@ class EstimateWorkbook:
         cell = ws.cell(row=self._row, column=6, value=f'=({refs})')
         cell.number_format = '0.00'
         cell.font = self.styles.BOLD_FONT_L
-        for c in range(1, 8):
+        for c in range(1, 9):
             ws.cell(row=self._row, column=c).fill = self.styles.SUMMARY_FILL
             ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
         self._row += 2
@@ -223,7 +233,7 @@ class EstimateWorkbook:
         ws = self._sheet1
         cfg = self.config
 
-        ws.merge_cells(f'A{self._row}:G{self._row}')
+        ws.merge_cells(f'A{self._row}:H{self._row}')
         ws[f'A{self._row}'] = '▼ 調整計算'
         ws[f'A{self._row}'].font = Font(bold=True, size=12)
         self._row += 1
@@ -244,7 +254,7 @@ class EstimateWorkbook:
             if isinstance(default, float) and default < 1:
                 cell.number_format = '0%'
             ws.cell(row=self._row, column=7, value=note)
-            for c in range(1, 8):
+            for c in range(1, 9):
                 ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
             cell_refs[label.split(' ')[0]] = f'C{self._row}'
             self._row += 1
@@ -257,29 +267,143 @@ class EstimateWorkbook:
             ('Step 4: リスクバッファ加算後 ★最終工数★',
              f'=F{self._row-1}*(1+{cell_refs["リスクバッファ率"]})', ''),
         ]
+        step_rows = {}
         for label, formula, note in steps:
             ws.cell(row=self._row, column=2, value=label)
             cell = ws.cell(row=self._row, column=6, value=formula)
             cell.number_format = '0.00'
             if '★' in label:
                 cell.font = self.styles.FINAL_FONT
-                for c in range(1, 8):
+                for c in range(1, 9):
                     ws.cell(row=self._row, column=c).fill = self.styles.SUMMARY_FILL
             ws.cell(row=self._row, column=7, value=note)
-            for c in range(1, 8):
+            for c in range(1, 9):
                 ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
+            if 'Step 4' in label:
+                step_rows['step4'] = self._row
             self._row += 1
 
         # Anti-double-buffer check
         self._row += 1
         risk_ref = cell_refs.get("リスクバッファ率", "0%")
-        ws.merge_cells(f'A{self._row}:G{self._row}')
+        ws.merge_cells(f'A{self._row}:H{self._row}')
         ws[f'A{self._row}'] = (
             f'✔ Anti-double-buffer: PERT使用→バッファ減半 | '
             f'最終バッファ率={risk_ref} | '
             f'=IF({risk_ref}>0.5,"⚠ 50%超！重複の可能性","✔ 50%未満OK")'
         )
         ws[f'A{self._row}'].font = self.styles.CHECK_FONT
+
+        # Add CI section with 3 range types
+        self._write_ci_section(cell_refs, step_rows)
+
+    def _write_ci_section(self, cell_refs, step_rows):
+        """Add PERT CI section with 3 range types: absolute extremes + statistical CI + expected value."""
+        ws = self._sheet1
+        self._row += 2
+        ws.merge_cells(f'A{self._row}:H{self._row}')
+        ws.cell(row=self._row, column=1, value='▼ PERT 信頼区間 (Confidence Interval)').font = Font(bold=True, size=12)
+        self._row += 1
+
+        ws.merge_cells(f'A{self._row}:H{self._row}')
+        ws.cell(row=self._row, column=1, value='全O値/全P値 = 絶対的上下限 | PERT統計CI = 各task偏差の相互打消しを考慮').font = Font(size=9, color='666666')
+        self._row += 1
+
+        skill_ref = cell_refs.get("技能係数", "C1")
+        mgmt_ref = cell_refs.get("管理工数率", "C1")
+        risk_ref = cell_refs.get("リスクバッファ率", "C1")
+        step4_row = step_rows['step4']
+        adj_mul = f'{skill_ref}*(1+{mgmt_ref})*(1+{risk_ref})'
+        final_ref = f'F{step4_row}'
+
+        # Sigma formulas
+        sigma_refs = [f'H{r}' for r in self.subtotal_rows.values()]
+        sigma_formula = '=SQRT(' + '+'.join(sigma_refs) + ')'
+
+        all_o_refs = [f'C{r}' for rows in self.section_task_rows.values() for r in rows]
+        all_p_refs = [f'E{r}' for rows in self.section_task_rows.values() for r in rows]
+        all_o_formula = '=(' + '+'.join(all_o_refs) + ')'
+        all_p_formula = '=(' + '+'.join(all_p_refs) + ')'
+
+        ws.cell(row=self._row, column=2, value='PERT 標準偏差 σ_total')
+        ws.cell(row=self._row, column=6, value=sigma_formula).number_format = '0.00'
+        ws.cell(row=self._row, column=6).font = self.styles.BOLD_FONT
+        ws.cell(row=self._row, column=7, value='√(Σσ²_i)')
+        for c in range(1, 9):
+            ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
+        sigma_row = self._row
+        self._row += 1
+
+        ws.cell(row=self._row, column=2, value='調整後標準偏差 (σ_adjusted)')
+        ws.cell(row=self._row, column=6, value=f'=F{sigma_row}*{adj_mul}').number_format = '0.00'
+        ws.cell(row=self._row, column=7, value='σ_total × 調整係数（最終工数スケールに換算）')
+        for c in range(1, 9):
+            ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
+        sigma_adj_row = self._row
+        self._row += 1
+
+        # ① Absolute extremes
+        self._row += 1
+        section_fill = PatternFill(start_color='D6E4F0', end_color='D6E4F0', fill_type='solid')
+        section_font = Font(bold=True, size=10, color='1F4E79')
+        ws.merge_cells(f'A{self._row}:H{self._row}')
+        ws.cell(row=self._row, column=1, value='① 全楽観〜全悲観 (絶対的上下限 — 全taskが同時に最良/最悪となる極めて稀なケース)')
+        ws.cell(row=self._row, column=1).font = section_font
+        ws.cell(row=self._row, column=1).fill = section_fill
+        self._row += 1
+
+        for label, formula, note in [
+            ('全O値合計 (楽観極値)', f'={all_o_formula}*{adj_mul}', '全taskが楽観値通り進んだ場合の下限'),
+            ('全P値合計 (悲観極値)', f'={all_p_formula}*{adj_mul}', '全taskが悲観値通り難航した場合の上限'),
+        ]:
+            ws.cell(row=self._row, column=2, value=label)
+            ws.cell(row=self._row, column=6, value=formula).number_format = '0.0'
+            ws.cell(row=self._row, column=7, value=note)
+            for c in range(1, 9):
+                ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
+            self._row += 1
+
+        # ② Statistical CI
+        self._row += 1
+        ws.merge_cells(f'A{self._row}:H{self._row}')
+        ws.cell(row=self._row, column=1, value='② PERT 統計的信頼区間 (各taskの偏差が独立・相互打消しすることを考慮)')
+        ws.cell(row=self._row, column=1).font = section_font
+        ws.cell(row=self._row, column=1).fill = section_fill
+        self._row += 1
+
+        for label, formula, note in [
+            ('68% CI 下限 (±1σ)', f'={final_ref}-F{sigma_adj_row}', '約2/3の確率でこの範囲内'),
+            ('68% CI 上限 (±1σ)', f'={final_ref}+F{sigma_adj_row}', ''),
+            ('95% CI 下限 (±2σ) ★', f'={final_ref}-2*F{sigma_adj_row}', '約95%の確率（推奨提示範囲）'),
+            ('95% CI 上限 (±2σ) ★', f'={final_ref}+2*F{sigma_adj_row}', 'PERT期待値 ± 2σ_adjusted'),
+        ]:
+            ws.cell(row=self._row, column=2, value=label)
+            cell = ws.cell(row=self._row, column=6, value=formula)
+            cell.number_format = '0.0'
+            if '★' in label:
+                cell.font = self.styles.FINAL_FONT
+            ws.cell(row=self._row, column=7, value=note)
+            for c in range(1, 9):
+                ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
+                if '★' in label:
+                    ws.cell(row=self._row, column=c).fill = self.styles.SUMMARY_FILL
+            self._row += 1
+
+        # ③ Expected value
+        self._row += 1
+        ws.merge_cells(f'A{self._row}:H{self._row}')
+        ws.cell(row=self._row, column=1, value='③ PERT 期待値 (最可能値 — 本見積の提示値)')
+        ws.cell(row=self._row, column=1).font = section_font
+        ws.cell(row=self._row, column=1).fill = section_fill
+        self._row += 1
+
+        ws.cell(row=self._row, column=2, value='PERT 期待値 (本見積の提示値)')
+        cell = ws.cell(row=self._row, column=6, value=f'={final_ref}')
+        cell.number_format = '0.0'
+        cell.font = self.styles.FINAL_FONT
+        for c in range(1, 9):
+            ws.cell(row=self._row, column=c).fill = self.styles.SUMMARY_FILL
+            ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
 
     def finalize(self, summary_sections=None, summary_labels=None):
         """
