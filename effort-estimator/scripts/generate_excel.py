@@ -127,7 +127,13 @@ class EstimateWorkbook:
         self.tasks.append(('section', label))
 
     def add_task(self, tid, name, o, m, p, note=''):
-        """Add a task row with O/M/P values. PERT formula = (O+4M+P)/6 auto-applied."""
+        """Add a task row with O/M/P values. PERT formula = (O+4M+P)/6 auto-applied.
+        tid must start with the section letter (e.g. 'A1', 'B2')."""
+        if not (tid and tid[0].isalpha()):
+            raise ValueError(
+                f"Task ID '{tid}' must start with a section letter (e.g. 'A1', 'B2'). "
+                "This is required for subtotal row grouping."
+            )
         self.tasks.append(('task', tid, name, o, m, p, note))
 
     def add_subtotal(self, letter, label):
@@ -220,6 +226,8 @@ class EstimateWorkbook:
         ws.merge_cells(f'B{self._row}:D{self._row}')
         ws.cell(row=self._row, column=2, value='PERT 純工数 合計').font = self.styles.BOLD_FONT_L
         refs = '+'.join([f'F{self.subtotal_rows[s]}' for s in summary_sections if s in self.subtotal_rows])
+        if not refs:
+            refs = '0'
         cell = ws.cell(row=self._row, column=6, value=f'=({refs})')
         cell.number_format = '0.00'
         cell.font = self.styles.BOLD_FONT_L
@@ -240,12 +248,12 @@ class EstimateWorkbook:
 
         # -- Adjustable input cells --
         inputs = [
-            ('技能係数 (変更可 →)', cfg['skill_coef'], cfg['skill_note']),
-            ('管理工数率 (変更可 →)', cfg['mgmt_rate'], cfg['mgmt_note']),
-            ('リスクバッファ率 (変更可 →)', cfg['risk_rate'], cfg['risk_note']),
+            ('skill_coef',  '技能係数 (変更可 →)',    cfg['skill_coef'], cfg['skill_note']),
+            ('mgmt_rate',   '管理工数率 (変更可 →)',   cfg['mgmt_rate'],  cfg['mgmt_note']),
+            ('risk_rate',   'リスクバッファ率 (変更可 →)', cfg['risk_rate'],  cfg['risk_note']),
         ]
         cell_refs = {}
-        for label, default, note in inputs:
+        for key, label, default, note in inputs:
             ws.cell(row=self._row, column=2, value=label)
             cell = ws.cell(row=self._row, column=3, value=default)
             cell.alignment = self.styles.CENTER
@@ -256,17 +264,24 @@ class EstimateWorkbook:
             ws.cell(row=self._row, column=7, value=note)
             for c in range(1, 9):
                 ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
-            cell_refs[label.split(' ')[0]] = f'C{self._row}'
+            cell_refs[key] = f'C{self._row}'
             self._row += 1
+        # Store for cross-sheet reference (e.g. Phase sheet)
+        self._adjustment_cell_refs = cell_refs
 
-        # -- Calculated steps --
+        # -- Calculated steps (each refs the just-written row above: self._row-1) --
         steps = [
             ('Step 1: PERT 純工数', f'=F{self._pert_total_row}', '全タスクの三点見積集計'),
-            ('Step 2: 技能係数調整後', f'=F{self._row-3}*{cell_refs["技能係数"]}', ''),
-            ('Step 3: 管理工数加算後', f'=F{self._row-2}*(1+{cell_refs["管理工数率"]})', ''),
-            ('Step 4: リスクバッファ加算後 ★最終工数★',
-             f'=F{self._row-1}*(1+{cell_refs["リスクバッファ率"]})', ''),
         ]
+        step_start = self._row
+        self._row += 1  # Step 1 written
+        steps.append(('Step 2: 技能係数調整後', f'=F{self._row-1}*{cell_refs["skill_coef"]}', ''))
+        self._row += 1  # Step 2 will occupy this row
+        steps.append(('Step 3: 管理工数加算後', f'=F{self._row-1}*(1+{cell_refs["mgmt_rate"]})', ''))
+        self._row += 1  # Step 3 will occupy this row
+        steps.append(('Step 4: リスクバッファ加算後 ★最終工数★',
+             f'=F{self._row-1}*(1+{cell_refs["risk_rate"]})', ''))
+        self._row = step_start  # reset to start writing
         step_rows = {}
         for label, formula, note in steps:
             ws.cell(row=self._row, column=2, value=label)
@@ -285,7 +300,7 @@ class EstimateWorkbook:
 
         # Anti-double-buffer check
         self._row += 1
-        risk_ref = cell_refs.get("リスクバッファ率", "0%")
+        risk_ref = cell_refs.get("risk_rate", "0%")
         ws.merge_cells(f'A{self._row}:H{self._row}')
         ws[f'A{self._row}'] = (
             f'✔ Anti-double-buffer: PERT使用→バッファ減半 | '
@@ -309,21 +324,21 @@ class EstimateWorkbook:
         ws.cell(row=self._row, column=1, value='全O値/全P値 = 絶対的上下限 | PERT統計CI = 各task偏差の相互打消しを考慮').font = Font(size=9, color='666666')
         self._row += 1
 
-        skill_ref = cell_refs.get("技能係数", "C1")
-        mgmt_ref = cell_refs.get("管理工数率", "C1")
-        risk_ref = cell_refs.get("リスクバッファ率", "C1")
+        skill_ref = cell_refs.get("skill_coef", "C1")
+        mgmt_ref = cell_refs.get("mgmt_rate", "C1")
+        risk_ref = cell_refs.get("risk_rate", "C1")
         step4_row = step_rows['step4']
         adj_mul = f'{skill_ref}*(1+{mgmt_ref})*(1+{risk_ref})'
         final_ref = f'F{step4_row}'
 
         # Sigma formulas
         sigma_refs = [f'H{r}' for r in self.subtotal_rows.values()]
-        sigma_formula = '=SQRT(' + '+'.join(sigma_refs) + ')'
+        sigma_formula = '=SQRT(' + '+'.join(sigma_refs) + ')' if sigma_refs else '=SQRT(0)'
 
         all_o_refs = [f'C{r}' for rows in self.section_task_rows.values() for r in rows]
         all_p_refs = [f'E{r}' for rows in self.section_task_rows.values() for r in rows]
-        all_o_formula = '=(' + '+'.join(all_o_refs) + ')'
-        all_p_formula = '=(' + '+'.join(all_p_refs) + ')'
+        all_o_formula = '(' + '+'.join(all_o_refs) + ')'
+        all_p_formula = '(' + '+'.join(all_p_refs) + ')'
 
         ws.cell(row=self._row, column=2, value='PERT 標準偏差 σ_total')
         ws.cell(row=self._row, column=6, value=sigma_formula).number_format = '0.00'
@@ -433,7 +448,6 @@ class EstimateWorkbook:
         phases: list of dicts, each dict:
             {
                 'name': 'Phase 1',
-                'label': '日報・議事録 MVP',
                 'sections': [('A. プロジェクト基盤', 'A', 1.0), ...]
                     # (display_label, section_letter, ratio) — ratio: 割合 (0.5 for 50%)
                 'note': '8月リリース目標',
@@ -462,8 +476,19 @@ class EstimateWorkbook:
             cell.alignment = self.styles.CENTER
             cell.border = self.styles.THIN_BORDER
 
-        mr = mgmt_rate if mgmt_rate is not None else self.config['mgmt_rate']
-        rr = risk_rate if risk_rate is not None else self.config['risk_rate']
+        # Use cell references from WBS+PERT if available, else fall back to config values
+        refs = getattr(self, '_adjustment_cell_refs', {})
+        mgmt_ref = refs.get('mgmt_rate', None)
+        risk_ref = refs.get('risk_rate', None)
+        if mgmt_ref:
+            mgmt_ref = f"'WBS+PERT'!{mgmt_ref}"
+        else:
+            mgmt_ref = mgmt_rate if mgmt_rate is not None else self.config['mgmt_rate']
+        if risk_ref:
+            risk_ref = f"'WBS+PERT'!{risk_ref}"
+        else:
+            risk_ref = risk_rate if risk_rate is not None else self.config['risk_rate']
+
         r = 4
         phase_totals = []
 
@@ -477,7 +502,7 @@ class EstimateWorkbook:
                 else:
                     ws.cell(row=r, column=3, value=f"='WBS+PERT'!F{self.subtotal_rows[sec]}")
                 ws.cell(row=r, column=3).number_format = '0.00'
-                ws.cell(row=r, column=4, value=f'=C{r}*(1+{mr})*(1+{rr})')
+                ws.cell(row=r, column=4, value=f'=C{r}*(1+{mgmt_ref})*(1+{risk_ref})')
                 ws.cell(row=r, column=4).number_format = '0.00'
                 ws.cell(row=r, column=5, value=phase.get('note', ''))
                 for c in range(1, 6):
@@ -542,6 +567,8 @@ class EstimateWorkbook:
     # ── Save ──
 
     def save(self, path):
+        if not self._finalized:
+            raise RuntimeError("Call finalize() before save()")
         self.wb.save(path)
         print(f'Saved: {path}')
 
@@ -568,7 +595,7 @@ def from_dict(project: dict, output_path: str):
         'summary_sections': ['A','B',...],
         'summary_labels': {'A': 'A. xx', ...},
         'phases': [  # optional
-            {'name': 'Phase 1', 'label': '...', 'sections': [...], 'note': '...'},
+            {'name': 'Phase 1', 'sections': [...], 'note': '...'},
         ],
         'assumptions': [  # optional
             ('仮定1', '影響1'),
@@ -587,7 +614,7 @@ def from_dict(project: dict, output_path: str):
             tid, name, o, m, p = t[0], t[1], t[2], t[3], t[4]
             note = t[5] if len(t) > 5 else ''
             wb.add_task(tid, name, o, m, p, note)
-        wb.add_subtotal(letter, f'{letter}. {label.strip("【】").split("】")[-1] if "】" in label else label} 小計')
+        wb.add_subtotal(letter, f'{label.strip("【】")} 小計')
 
     wb.finalize(
         summary_sections=project.get('summary_sections'),
