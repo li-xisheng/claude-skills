@@ -69,9 +69,23 @@ description: >
 
 ```bash
 cd <work-dir>
-npm install docx  # 仅首次
+
+# 依赖（首次运行必须）：在工作目录安装 docx 包到本地 node_modules
+npm install docx
+
+# 然后调用脚本
 node <skill-path>/scripts/generate_proposal.js content.json output.docx
 ```
+
+**模块解析提示**：脚本本身放在 skills 目录下，但 Node 解析依赖时从脚本所在目录向上查找。
+若工作目录已有 `node_modules/docx`，可设置 `NODE_PATH` 让脚本找到它：
+```bash
+# Windows PowerShell
+$env:NODE_PATH = "$(Get-Location)\node_modules"
+# Linux/Mac
+export NODE_PATH="$(pwd)/node_modules"
+```
+或更简单：把 `generate_proposal.js` 复制到工作目录里执行。
 
 `scripts/generate_proposal.js` 是即拿即用的封装：自动应用咨询风格（深蓝标题、表头配色、字体）、自动处理中/日/英文字体切换、自动生成 SCQA 框、比较矩阵、Phase 路线图等元素。
 
