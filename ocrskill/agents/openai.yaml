@@ -1,0 +1,4 @@
+interface:
+  display_name: "OCR Skill"
+  short_description: "Run MinerU OCR over PDFs to DOCX"
+  default_prompt: "Use $ocrskill to OCR every PDF in this folder and produce JSON, layout images, and a DOCX."
