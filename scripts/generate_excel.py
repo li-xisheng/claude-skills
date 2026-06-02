@@ -1,18 +1,18 @@
 """
-宸ユ暟瑕嬬 Excel 鐢熸垚銈广偗銉儣銉?鈥?姹庣敤銉诲啀鍒╃敤鍙兘
+工数見積 Excel 生成スクリプト — 汎用・再利用可能
 
 Usage:
     from generate_excel import EstimateWorkbook
     wb = EstimateWorkbook()
-    wb.set_meta(title="妗堜欢鍚?, date="2026-05-19", config={...})
+    wb.set_meta(title="案件名", date="2026-05-19", config={...})
     # add sections -> add tasks -> finalize
-    wb.add_section("A", "銉椼儹銈搞偋銈儓鍩虹洡")
-    wb.add_task("A1", "kintone鎶€琛撴瑷?, o=2, m=4, p=8, note="鏈€鍎厛")
-    wb.add_subtotal("A", "A. 銉椼儹銈搞偋銈儓鍩虹洡 灏忚▓")
+    wb.add_section("A", "プロジェクト基盤")
+    wb.add_task("A1", "kintone技術検証", o=2, m=4, p=8, note="最優先")
+    wb.add_subtotal("A", "A. プロジェクト基盤 小計")
     ...
     wb.finalize()
     wb.add_phase_sheet(phase1=[...], phase2=[...])
-    wb.add_assumptions_sheet([("浠畾", "褰遍熆"), ...])
+    wb.add_assumptions_sheet([("仮定", "影響"), ...])
     wb.save("output.xlsx")
 """
 
@@ -20,7 +20,7 @@ import openpyxl
 from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
 from openpyxl.utils import get_column_letter
 
-# 鈹€鈹€ Styling constants (customize per project if needed) 鈹€鈹€
+# ── Styling constants (customize per project if needed) ──
 
 class Styles:
     """Centralized style definitions. Override per-project by passing a subclass."""
@@ -51,9 +51,9 @@ class EstimateWorkbook:
     Generic estimation workbook builder.
 
     Sheet structure:
-        1. WBS+PERT 鈥?task breakdown with formulas, adjustable coefficients, summary
-        2. Phase鍒嗗壊 (optional) 鈥?phase split view referencing sheet 1
-        3. 浠畾涓€瑕?(optional) 鈥?assumptions table
+        1. WBS+PERT — task breakdown with formulas, adjustable coefficients, summary
+        2. Phase分割 (optional) — phase split view referencing sheet 1
+        3. 仮定一覧 (optional) — assumptions table
     """
 
     def __init__(self, styles=None):
@@ -70,7 +70,7 @@ class EstimateWorkbook:
         self._sheet1.title = 'WBS+PERT'
         self._finalized = False
 
-    # 鈹€鈹€ Metadata & config 鈹€鈹€
+    # ── Metadata & config ──
 
     def set_meta(self, title, subtitle='', config=None):
         """
@@ -91,12 +91,12 @@ class EstimateWorkbook:
             'mgmt_rate': 0.20,
             'risk_rate': 0.15,
             'skill_note': 'Senior:0.8~1.0 Mid:1.2~1.5 Junior:2.0~3.0',
-            'mgmt_note': '瀹氫緥銉汇儸銉撱儱銉笺兓銉夈偔銉ャ儭銉炽儓 10~20%',
-            'risk_note': 'PERT娓涘崐銉兗銉? 30%鈫?5%',
+            'mgmt_note': '定例・レビュー・ドキュメント 10~20%',
+            'risk_note': 'PERT減半ルール: 30%→15%',
             **(config or {})
         }
 
-    # 鈹€鈹€ Sheet 1: WBS+PERT 鈹€鈹€
+    # ── Sheet 1: WBS+PERT ──
 
     def _setup_sheet1_columns(self):
         widths = self.config.get('col_widths', {})
@@ -108,13 +108,13 @@ class EstimateWorkbook:
         ws = self._sheet1
         self._setup_sheet1_columns()
         ws.merge_cells('A1:H1')
-        ws['A1'] = self.meta.get('title', '宸ユ暟瑕嬬')
+        ws['A1'] = self.meta.get('title', '工数見積')
         ws['A1'].font = self.styles.TITLE_FONT
         if self.meta.get('subtitle'):
             ws.merge_cells('A2:G2')
             ws['A2'] = self.meta['subtitle']
             ws['A2'].font = self.styles.SUBTITLE_FONT
-        headers = ['ID', '銈裤偣銈?, 'O (妤借Τ)', 'M (鏈€鍙兘)', 'P (鎮茶Τ)', 'PERT鏈熷緟鍊?, '鍌欒€?, '鍒嗘暎 蟽虏']
+        headers = ['ID', 'タスク', 'O (楽観)', 'M (最可能)', 'P (悲観)', 'PERT期待値', '備考', '分散 σ²']
         for col, h in enumerate(headers, 1):
             cell = ws.cell(row=4, column=col, value=h)
             cell.font = self.styles.HEADER_FONT
@@ -123,7 +123,7 @@ class EstimateWorkbook:
             cell.border = self.styles.THIN_BORDER
 
     def add_section(self, label):
-        """Add a section header row. label is displayed text (e.g. '銆怉. 銉椼儹銈搞偋銈儓鍩虹洡銆?)."""
+        """Add a section header row. label is displayed text (e.g. '【A. プロジェクト基盤】')."""
         self.tasks.append(('section', label))
 
     def add_task(self, tid, name, o, m, p, note=''):
@@ -188,7 +188,7 @@ class EstimateWorkbook:
             cell.number_format = '0.00'
             cell.alignment = self.styles.CENTER
             ws.cell(row=self._row, column=7, value=note)
-            # Column H: per-task variance 蟽虏 = ((P-O)/6)虏
+            # Column H: per-task variance σ² = ((P-O)/6)²
             var_cell = ws.cell(row=self._row, column=8)
             var_cell.value = f'=((E{self._row}-C{self._row})/6)^2'
             var_cell.number_format = '0.0000'
@@ -207,7 +207,7 @@ class EstimateWorkbook:
         ws = self._sheet1
         self._row += 1
         ws.merge_cells(f'A{self._row}:G{self._row}')
-        ws[f'A{self._row}'] = '鈻?宸ョ▼鍒?PERT 绱斿伐鏁?闆嗚▓'
+        ws[f'A{self._row}'] = '▼ 工程別 PERT 純工数 集計'
         ws[f'A{self._row}'].font = Font(bold=True, size=12)
         self._row += 1
 
@@ -224,7 +224,7 @@ class EstimateWorkbook:
         # Total PERT
         self._pert_total_row = self._row
         ws.merge_cells(f'B{self._row}:D{self._row}')
-        ws.cell(row=self._row, column=2, value='PERT 绱斿伐鏁?鍚堣▓').font = self.styles.BOLD_FONT_L
+        ws.cell(row=self._row, column=2, value='PERT 純工数 合計').font = self.styles.BOLD_FONT_L
         refs = '+'.join([f'F{self.subtotal_rows[s]}' for s in summary_sections if s in self.subtotal_rows])
         if not refs:
             refs = '0'
@@ -242,15 +242,15 @@ class EstimateWorkbook:
         cfg = self.config
 
         ws.merge_cells(f'A{self._row}:H{self._row}')
-        ws[f'A{self._row}'] = '鈻?瑾挎暣瑷堢畻'
+        ws[f'A{self._row}'] = '▼ 調整計算'
         ws[f'A{self._row}'].font = Font(bold=True, size=12)
         self._row += 1
 
         # -- Adjustable input cells --
         inputs = [
-            ('skill_coef',  '鎶€鑳戒總鏁?(澶夋洿鍙?鈫?',    cfg['skill_coef'], cfg['skill_note']),
-            ('mgmt_rate',   '绠＄悊宸ユ暟鐜?(澶夋洿鍙?鈫?',   cfg['mgmt_rate'],  cfg['mgmt_note']),
-            ('risk_rate',   '銉偣銈儛銉冦儠銈＄巼 (澶夋洿鍙?鈫?', cfg['risk_rate'],  cfg['risk_note']),
+            ('skill_coef',  '技能係数 (変更可 →)',    cfg['skill_coef'], cfg['skill_note']),
+            ('mgmt_rate',   '管理工数率 (変更可 →)',   cfg['mgmt_rate'],  cfg['mgmt_note']),
+            ('risk_rate',   'リスクバッファ率 (変更可 →)', cfg['risk_rate'],  cfg['risk_note']),
         ]
         cell_refs = {}
         for key, label, default, note in inputs:
@@ -273,17 +273,17 @@ class EstimateWorkbook:
         # step_start + 0 = Step 1, step_start + 1 = Step 2, etc.
         step_start = self._row
         steps = [
-            ('Step 1: PERT 绱斿伐鏁?,                         f'=F{self._pert_total_row}',                               '鍏ㄣ偪銈广偗銇笁鐐硅绌嶉泦瑷?),
-            ('Step 2: 鎶€鑳戒總鏁拌鏁村緦',                       f'=F{step_start}*{cell_refs["skill_coef"]}',               ''),
-            ('Step 3: 绠＄悊宸ユ暟鍔犵畻寰?,                       f'=F{step_start+1}*(1+{cell_refs["mgmt_rate"]})',           ''),
-            ('Step 4: 銉偣銈儛銉冦儠銈″姞绠楀緦 鈽呮渶绲傚伐鏁扳槄',     f'=F{step_start+2}*(1+{cell_refs["risk_rate"]})',           ''),
+            ('Step 1: PERT 純工数',                         f'=F{self._pert_total_row}',                               '全タスクの三点見積集計'),
+            ('Step 2: 技能係数調整後',                       f'=F{step_start}*{cell_refs["skill_coef"]}',               ''),
+            ('Step 3: 管理工数加算後',                       f'=F{step_start+1}*(1+{cell_refs["mgmt_rate"]})',           ''),
+            ('Step 4: リスクバッファ加算後 ★最終工数★',     f'=F{step_start+2}*(1+{cell_refs["risk_rate"]})',           ''),
         ]
         step_rows = {}
         for label, formula, note in steps:
             ws.cell(row=self._row, column=2, value=label)
             cell = ws.cell(row=self._row, column=6, value=formula)
             cell.number_format = '0.00'
-            if '鈽? in label:
+            if '★' in label:
                 cell.font = self.styles.FINAL_FONT
                 for c in range(1, 9):
                     ws.cell(row=self._row, column=c).fill = self.styles.SUMMARY_FILL
@@ -294,16 +294,16 @@ class EstimateWorkbook:
                 step_rows['step4'] = self._row
             self._row += 1
 
-        # Anti-double-buffer check 鈥?actual Excel formula
+        # Anti-double-buffer check — actual Excel formula
         self._row += 1
         risk_ref = cell_refs.get("risk_rate", "0%")
         ws.merge_cells(f'A{self._row}:F{self._row}')
         ws.cell(row=self._row, column=1,
-                value=f'鉁?Anti-double-buffer: PERT浣跨敤鈫掋儛銉冦儠銈℃笡鍗?| 鏈€绲傘儛銉冦儠銈＄巼=').font = self.styles.CHECK_FONT
+                value=f'✔ Anti-double-buffer: PERT使用→バッファ減半 | 最終バッファ率=').font = self.styles.CHECK_FONT
         ws.cell(row=self._row, column=7).value = f'={risk_ref}'
         ws.cell(row=self._row, column=7).number_format = '0%'
         check = ws.cell(row=self._row, column=8)
-        check.value = f'=IF({risk_ref}>0.5,"鈿?50%瓒?閲嶈鍙兘鎬?,"鉁?50%鏈簚 OK")'
+        check.value = f'=IF({risk_ref}>0.5,"⚠ 50%超!重複可能性","✔ 50%未満 OK")'
         check.font = self.styles.CHECK_FONT
 
         # Add CI section with 3 range types
@@ -314,11 +314,11 @@ class EstimateWorkbook:
         ws = self._sheet1
         self._row += 2
         ws.merge_cells(f'A{self._row}:H{self._row}')
-        ws.cell(row=self._row, column=1, value='鈻?PERT 淇￠牸鍖洪枔 (Confidence Interval)').font = Font(bold=True, size=12)
+        ws.cell(row=self._row, column=1, value='▼ PERT 信頼区間 (Confidence Interval)').font = Font(bold=True, size=12)
         self._row += 1
 
         ws.merge_cells(f'A{self._row}:H{self._row}')
-        ws.cell(row=self._row, column=1, value='鍏∣鍊?鍏≒鍊?= 绲跺鐨勪笂涓嬮檺 | PERT绲辫▓CI = 鍚則ask鍋忓樊銇浉浜掓墦娑堛仐銈掕€冩叜').font = Font(size=9, color='666666')
+        ws.cell(row=self._row, column=1, value='全O値/全P値 = 絶対的上下限 | PERT統計CI = 各task偏差の相互打消しを考慮').font = Font(size=9, color='666666')
         self._row += 1
 
         skill_ref = cell_refs.get("skill_coef", "C1")
@@ -337,36 +337,36 @@ class EstimateWorkbook:
         all_o_formula = '(' + '+'.join(all_o_refs) + ')'
         all_p_formula = '(' + '+'.join(all_p_refs) + ')'
 
-        ws.cell(row=self._row, column=2, value='PERT 妯欐簴鍋忓樊 蟽_total')
+        ws.cell(row=self._row, column=2, value='PERT 標準偏差 σ_total')
         ws.cell(row=self._row, column=6, value=sigma_formula).number_format = '0.00'
         ws.cell(row=self._row, column=6).font = self.styles.BOLD_FONT
-        ws.cell(row=self._row, column=7, value='鈭?危蟽虏_i)')
+        ws.cell(row=self._row, column=7, value='√(Σσ²_i)')
         for c in range(1, 9):
             ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
         sigma_row = self._row
         self._row += 1
 
-        ws.cell(row=self._row, column=2, value='瑾挎暣寰屾婧栧亸宸?(蟽_adjusted)')
+        ws.cell(row=self._row, column=2, value='調整後標準偏差 (σ_adjusted)')
         ws.cell(row=self._row, column=6, value=f'=F{sigma_row}*{adj_mul}').number_format = '0.00'
-        ws.cell(row=self._row, column=7, value='蟽_total 脳 瑾挎暣淇傛暟锛堟渶绲傚伐鏁般偣銈便兗銉伀鎻涚畻锛?)
+        ws.cell(row=self._row, column=7, value='σ_total × 調整係数（最終工数スケールに換算）')
         for c in range(1, 9):
             ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
         sigma_adj_row = self._row
         self._row += 1
 
-        # 鈶?Absolute extremes
+        # ① Absolute extremes
         self._row += 1
         section_fill = PatternFill(start_color='D6E4F0', end_color='D6E4F0', fill_type='solid')
         section_font = Font(bold=True, size=10, color='1F4E79')
         ws.merge_cells(f'A{self._row}:H{self._row}')
-        ws.cell(row=self._row, column=1, value='鈶?鍏ㄦソ瑕炽€滃叏鎮茶Τ (绲跺鐨勪笂涓嬮檺 鈥?鍏╰ask銇屽悓鏅傘伀鏈€鑹?鏈€鎮仺銇倠妤点倎銇︾█銇偙銉笺偣)')
+        ws.cell(row=self._row, column=1, value='① 全楽観〜全悲観 (絶対的上下限 — 全taskが同時に最良/最悪となる極めて稀なケース)')
         ws.cell(row=self._row, column=1).font = section_font
         ws.cell(row=self._row, column=1).fill = section_fill
         self._row += 1
 
         for label, formula, note in [
-            ('鍏∣鍊ゅ悎瑷?(妤借Τ妤靛€?', f'={all_o_formula}*{adj_mul}', '鍏╰ask銇屾ソ瑕冲€ら€氥倞閫层倱銇犲牬鍚堛伄涓嬮檺'),
-            ('鍏≒鍊ゅ悎瑷?(鎮茶Τ妤靛€?', f'={all_p_formula}*{adj_mul}', '鍏╰ask銇屾偛瑕冲€ら€氥倞闆ｈ埅銇椼仧鍫村悎銇笂闄?),
+            ('全O値合計 (楽観極値)', f'={all_o_formula}*{adj_mul}', '全taskが楽観値通り進んだ場合の下限'),
+            ('全P値合計 (悲観極値)', f'={all_p_formula}*{adj_mul}', '全taskが悲観値通り難航した場合の上限'),
         ]:
             ws.cell(row=self._row, column=2, value=label)
             ws.cell(row=self._row, column=6, value=formula).number_format = '0.0'
@@ -375,41 +375,41 @@ class EstimateWorkbook:
                 ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
             self._row += 1
 
-        # 鈶?Statistical CI
+        # ② Statistical CI
         self._row += 1
         ws.merge_cells(f'A{self._row}:H{self._row}')
-        ws.cell(row=self._row, column=1, value='鈶?PERT 绲辫▓鐨勪俊闋煎尯闁?(鍚則ask銇亸宸亴鐙珛銉荤浉浜掓墦娑堛仐銇欍倠銇撱仺銈掕€冩叜)')
+        ws.cell(row=self._row, column=1, value='② PERT 統計的信頼区間 (各taskの偏差が独立・相互打消しすることを考慮)')
         ws.cell(row=self._row, column=1).font = section_font
         ws.cell(row=self._row, column=1).fill = section_fill
         self._row += 1
 
         for label, formula, note in [
-            ('68% CI 涓嬮檺 (卤1蟽)', f'={final_ref}-F{sigma_adj_row}', '绱?/3銇⒑鐜囥仹銇撱伄绡勫洸鍐?),
-            ('68% CI 涓婇檺 (卤1蟽)', f'={final_ref}+F{sigma_adj_row}', ''),
-            ('95% CI 涓嬮檺 (卤2蟽) 鈽?, f'={final_ref}-2*F{sigma_adj_row}', '绱?5%銇⒑鐜囷紙鎺ㄥエ鎻愮ず绡勫洸锛?),
-            ('95% CI 涓婇檺 (卤2蟽) 鈽?, f'={final_ref}+2*F{sigma_adj_row}', 'PERT鏈熷緟鍊?卤 2蟽_adjusted'),
+            ('68% CI 下限 (±1σ)', f'={final_ref}-F{sigma_adj_row}', '約2/3の確率でこの範囲内'),
+            ('68% CI 上限 (±1σ)', f'={final_ref}+F{sigma_adj_row}', ''),
+            ('95% CI 下限 (±2σ) ★', f'={final_ref}-2*F{sigma_adj_row}', '約95%の確率（推奨提示範囲）'),
+            ('95% CI 上限 (±2σ) ★', f'={final_ref}+2*F{sigma_adj_row}', 'PERT期待値 ± 2σ_adjusted'),
         ]:
             ws.cell(row=self._row, column=2, value=label)
             cell = ws.cell(row=self._row, column=6, value=formula)
             cell.number_format = '0.0'
-            if '鈽? in label:
+            if '★' in label:
                 cell.font = self.styles.FINAL_FONT
             ws.cell(row=self._row, column=7, value=note)
             for c in range(1, 9):
                 ws.cell(row=self._row, column=c).border = self.styles.THIN_BORDER
-                if '鈽? in label:
+                if '★' in label:
                     ws.cell(row=self._row, column=c).fill = self.styles.SUMMARY_FILL
             self._row += 1
 
-        # 鈶?Expected value
+        # ③ Expected value
         self._row += 1
         ws.merge_cells(f'A{self._row}:H{self._row}')
-        ws.cell(row=self._row, column=1, value='鈶?PERT 鏈熷緟鍊?(鏈€鍙兘鍊?鈥?鏈绌嶃伄鎻愮ず鍊?')
+        ws.cell(row=self._row, column=1, value='③ PERT 期待値 (最可能値 — 本見積の提示値)')
         ws.cell(row=self._row, column=1).font = section_font
         ws.cell(row=self._row, column=1).fill = section_fill
         self._row += 1
 
-        ws.cell(row=self._row, column=2, value='PERT 鏈熷緟鍊?(鏈绌嶃伄鎻愮ず鍊?')
+        ws.cell(row=self._row, column=2, value='PERT 期待値 (本見積の提示値)')
         cell = ws.cell(row=self._row, column=6, value=f'={final_ref}')
         cell.number_format = '0.0'
         cell.font = self.styles.FINAL_FONT
@@ -422,7 +422,7 @@ class EstimateWorkbook:
         Finalize sheet 1: write header, tasks, summary, adjustments.
         Must be called after all add_section/add_task/add_subtotal calls.
         summary_sections: ordered list of section letters for the summary table.
-        summary_labels: {letter: 'A. 宸ョ▼鍚?} dict for display.
+        summary_labels: {letter: 'A. 工程名'} dict for display.
         """
         self._write_sheet1_header()
         self._write_tasks()
@@ -435,9 +435,9 @@ class EstimateWorkbook:
         self._sheet1.freeze_panes = 'A5'
         self._finalized = True
 
-    # 鈹€鈹€ Sheet 2: Phase 鍒嗗壊 鈹€鈹€
+    # ── Sheet 2: Phase 分割 ──
 
-    def add_phase_sheet(self, phases, sheet_name='Phase鍒嗗壊',
+    def add_phase_sheet(self, phases, sheet_name='Phase分割',
                         mgmt_rate=None, risk_rate=None):
         """
         Add a phase split sheet.
@@ -445,10 +445,10 @@ class EstimateWorkbook:
         phases: list of dicts, each dict:
             {
                 'name': 'Phase 1',
-                'sections': [('A. 銉椼儹銈搞偋銈儓鍩虹洡', 'A', 1.0), ...]
-                    # (display_label, section_letter, ratio) 鈥?ratio: 鍓插悎 (0.5 for 50%)
-                'note': '8鏈堛儶銉兗銈圭洰妯?,
-                'summary_note': '绱?00浜烘棩',  # optional
+                'sections': [('A. プロジェクト基盤', 'A', 1.0), ...]
+                    # (display_label, section_letter, ratio) — ratio: 割合 (0.5 for 50%)
+                'note': '8月リリース目標',
+                'summary_note': '約100人日',  # optional
             }
         mgmt_rate, risk_rate: override sheet1's config if given
         """
@@ -463,10 +463,10 @@ class EstimateWorkbook:
         ws.column_dimensions['E'].width = 22
 
         ws.merge_cells('A1:E1')
-        ws['A1'] = 'Phase 鍒嗗壊鎻愭'
+        ws['A1'] = 'Phase 分割提案'
         ws['A1'].font = self.styles.TITLE_FONT
 
-        for col, h in enumerate(['Phase', '宸ョ▼', 'PERT绱斿伐鏁?, '瑾挎暣寰屽伐鏁?, '鍌欒€?], 1):
+        for col, h in enumerate(['Phase', '工程', 'PERT純工数', '調整後工数', '備考'], 1):
             cell = ws.cell(row=3, column=col, value=h)
             cell.font = self.styles.HEADER_FONT
             cell.fill = self.styles.HEADER_FILL
@@ -513,7 +513,7 @@ class EstimateWorkbook:
 
             # Phase subtotal
             ws.merge_cells(f'A{r}:B{r}')
-            ws.cell(row=r, column=1, value=f'{phase["name"]} 鍚堣▓').font = self.styles.BOLD_FONT
+            ws.cell(row=r, column=1, value=f'{phase["name"]} 合計').font = self.styles.BOLD_FONT
             ws.cell(row=r, column=3, value=f'=SUM(C{start_r}:C{r-1})').number_format = '0.00'
             ws.cell(row=r, column=3).font = self.styles.BOLD_FONT
             ws.cell(row=r, column=4, value=f'=SUM(D{start_r}:D{r-1})').number_format = '0.00'
@@ -528,16 +528,16 @@ class EstimateWorkbook:
 
         # Grand total
         r += 1
-        ws.cell(row=r, column=2, value='鍏ㄤ綋鍚堣▓').font = Font(bold=True, size=12)
+        ws.cell(row=r, column=2, value='全体合計').font = Font(bold=True, size=12)
         refs = '+'.join([f'D{pt}' for pt in phase_totals])
         ws.cell(row=r, column=4, value=f'={refs}').number_format = '0.00'
         ws.cell(row=r, column=4).font = Font(bold=True, size=12)
 
         ws.freeze_panes = 'A4'
 
-    # 鈹€鈹€ Sheet 3: 浠畾涓€瑕?鈹€鈹€
+    # ── Sheet 3: 仮定一覧 ──
 
-    def add_assumptions_sheet(self, assumptions, sheet_name='浠畾涓€瑕?):
+    def add_assumptions_sheet(self, assumptions, sheet_name='仮定一覧'):
         """
         Add an assumptions/reference sheet.
 
@@ -549,10 +549,10 @@ class EstimateWorkbook:
         ws.column_dimensions['C'].width = 35
 
         ws.merge_cells('A1:C1')
-        ws['A1'] = '涓昏浠畾銇ㄥ墠鎻愭潯浠?
+        ws['A1'] = '主要仮定と前提条件'
         ws['A1'].font = self.styles.TITLE_FONT
 
-        for col, h in enumerate(['#', '浠畾', '澶夊嫊銇椼仧鍫村悎銇奖闊?], 1):
+        for col, h in enumerate(['#', '仮定', '変動した場合の影響'], 1):
             cell = ws.cell(row=3, column=col, value=h)
             cell.font = self.styles.HEADER_FONT
             cell.fill = self.styles.HEADER_FILL
@@ -566,7 +566,7 @@ class EstimateWorkbook:
             for c in range(1, 4):
                 ws.cell(row=i+3, column=c).border = self.styles.THIN_BORDER
 
-    # 鈹€鈹€ Save 鈹€鈹€
+    # ── Save ──
 
     def save(self, path):
         if not self._finalized:
@@ -575,22 +575,22 @@ class EstimateWorkbook:
         print(f'Saved: {path}')
 
 
-# 鈹€鈹€ Convenience: generate from a simple dict structure 鈹€鈹€
+# ── Convenience: generate from a simple dict structure ──
 
 def from_dict(project: dict, output_path: str):
     """
     Quick generation from a declarative dict.
 
     project = {
-        'title': '妗堜欢鍚?宸ユ暟瑕嬬',
-        'subtitle': '浣滄垚鏃? 2026-05-19 | ...',
+        'title': '案件名 工数見積',
+        'subtitle': '作成日: 2026-05-19 | ...',
         'config': {  # optional overrides
             'skill_coef': 1.0, 'mgmt_rate': 0.20, 'risk_rate': 0.15,
             'skill_note': '...', 'mgmt_note': '...', 'risk_note': '...',
         },
         'sections': [
-            ('A', '銆怉. 宸ョ▼鍚嶃€?, [
-                ('A1', '銈裤偣銈悕', o, m, p, '鍌欒€?),
+            ('A', '【A. 工程名】', [
+                ('A1', 'タスク名', o, m, p, '備考'),
                 ...
             ]),
         ],
@@ -600,7 +600,7 @@ def from_dict(project: dict, output_path: str):
             {'name': 'Phase 1', 'sections': [...], 'note': '...'},
         ],
         'assumptions': [  # optional
-            ('浠畾1', '褰遍熆1'),
+            ('仮定1', '影響1'),
         ],
     }
     """
@@ -616,7 +616,7 @@ def from_dict(project: dict, output_path: str):
             tid, name, o, m, p = t[0], t[1], t[2], t[3], t[4]
             note = t[5] if len(t) > 5 else ''
             wb.add_task(tid, name, o, m, p, note)
-        wb.add_subtotal(letter, f'{label.strip("銆愩€?)} 灏忚▓')
+        wb.add_subtotal(letter, f'{label.strip("【】")} 小計')
 
     wb.finalize(
         summary_sections=project.get('summary_sections'),
@@ -632,25 +632,25 @@ def from_dict(project: dict, output_path: str):
 
 
 if __name__ == '__main__':
-    # Example usage (abstract 鈥?replace with real project data)
+    # Example usage (abstract — replace with real project data)
     project = {
-        'title': '銈点兂銉椼儷妗堜欢 宸ユ暟瑕嬬',
-        'subtitle': '浣滄垚鏃? 2026-XX-XX | 闁嬬櫤鍩烘簴: 涓€鑸枊鐧鸿€?,
+        'title': 'サンプル案件 工数見積',
+        'subtitle': '作成日: 2026-XX-XX | 開発基準: 一般開発者',
         'config': {},
         'sections': [
-            ('A', '銆怉. 銈点兂銉椼儷宸ョ▼銆?, [
-                ('A1', '銈点兂銉椼儷銈裤偣銈?', 1, 2, 3, ''),
-                ('A2', '銈点兂銉椼儷銈裤偣銈?', 2, 3, 5, '鍌欒€冧緥'),
+            ('A', '【A. サンプル工程】', [
+                ('A1', 'サンプルタスク1', 1, 2, 3, ''),
+                ('A2', 'サンプルタスク2', 2, 3, 5, '備考例'),
             ]),
-            ('B', '銆怋. 鍒ュ伐绋嬨€?, [
-                ('B1', '鍒ャ偪銈广偗1', 1, 1.5, 3, ''),
+            ('B', '【B. 別工程】', [
+                ('B1', '別タスク1', 1, 1.5, 3, ''),
             ]),
         ],
         'summary_sections': ['A', 'B'],
-        'summary_labels': {'A': 'A. 銈点兂銉椼儷宸ョ▼', 'B': 'B. 鍒ュ伐绋?},
+        'summary_labels': {'A': 'A. サンプル工程', 'B': 'B. 別工程'},
         'assumptions': [
-            ('浠畾銇緥1', '澶夊嫊銇椼仧鍫村悎 卤X浜烘棩'),
-            ('浠畾銇緥2', '澶夊嫊銇椼仧鍫村悎 +Y浜烘棩'),
+            ('仮定の例1', '変動した場合 ±X人日'),
+            ('仮定の例2', '変動した場合 +Y人日'),
         ],
     }
     from_dict(project, '/tmp/sample_estimate.xlsx')

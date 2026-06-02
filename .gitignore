@@ -1,2 +1,8 @@
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Test artifacts
+/tmp/*.xlsx
