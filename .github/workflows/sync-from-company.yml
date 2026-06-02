@@ -2,7 +2,6 @@ name: Sync from company repo
 
 on:
   schedule:
-    # Every 4 hours
     - cron: "0 */4 * * *"
   workflow_dispatch:
 
@@ -32,6 +31,10 @@ jobs:
             git checkout --theirs .gitignore
             git add .gitignore
           fi
+
+          # Keep local workflow directory, do not accept workflow changes from company repo
+          git checkout HEAD -- .github/workflows || true
+          git add .github/workflows || true
 
           if git diff --name-only --diff-filter=U | grep -q .; then
             echo "Unresolved merge conflicts remain:"
