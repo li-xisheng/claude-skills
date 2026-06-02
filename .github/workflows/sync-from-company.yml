@@ -2,6 +2,7 @@ name: Sync from company repo
 
 on:
   schedule:
+    # Every 4 hours
     - cron: "0 */4 * * *"
   workflow_dispatch:
 
@@ -17,35 +18,25 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Sync from lxsWestar/claude-skills
+      - name: Sync files from lxsWestar/claude-skills
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git remote add company https://github.com/lxsWestar/claude-skills.git
-          git fetch company master
+          rm -rf /tmp/company-claude-skills
+          git clone --depth 1 https://github.com/lxsWestar/claude-skills.git /tmp/company-claude-skills
 
-          git merge company/master --allow-unrelated-histories --no-commit || true
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/workflows/' \
+            /tmp/company-claude-skills/ ./
 
-          if git diff --name-only --diff-filter=U | grep -q "^.gitignore$"; then
-            git checkout --theirs .gitignore
-            git add .gitignore
-          fi
+          git add -A
 
-          # Keep local workflow directory, do not accept workflow changes from company repo
-          git checkout HEAD -- .github/workflows || true
-          git add .github/workflows || true
-
-          if git diff --name-only --diff-filter=U | grep -q .; then
-            echo "Unresolved merge conflicts remain:"
-            git diff --name-only --diff-filter=U
-            exit 1
-          fi
-
-          if git diff --cached --quiet && git diff --quiet; then
+          if git diff --cached --quiet; then
             echo "No changes to sync"
             exit 0
           fi
 
-          git commit -m "sync: merge from lxsWestar/claude-skills"
+          git commit -m "sync: copy files from lxsWestar/claude-skills"
           git push origin master
