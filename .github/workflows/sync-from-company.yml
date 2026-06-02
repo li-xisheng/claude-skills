@@ -26,6 +26,23 @@ jobs:
           git remote add company https://github.com/lxsWestar/claude-skills.git
           git fetch company master
 
-          git merge company/master --allow-unrelated-histories -m "sync: merge from lxsWestar/claude-skills"
+          git merge company/master --allow-unrelated-histories --no-commit || true
 
+          if git diff --name-only --diff-filter=U | grep -q "^.gitignore$"; then
+            git checkout --theirs .gitignore
+            git add .gitignore
+          fi
+
+          if git diff --name-only --diff-filter=U | grep -q .; then
+            echo "Unresolved merge conflicts remain:"
+            git diff --name-only --diff-filter=U
+            exit 1
+          fi
+
+          if git diff --cached --quiet && git diff --quiet; then
+            echo "No changes to sync"
+            exit 0
+          fi
+
+          git commit -m "sync: merge from lxsWestar/claude-skills"
           git push origin master
