@@ -6,18 +6,26 @@ on:
     - cron: "0 */4 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: Sync from lxsWestar/claude-skills
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git remote add company https://github.com/lxsWestar/claude-skills.git
           git fetch company master
+
           git merge company/master --allow-unrelated-histories -m "sync: merge from lxsWestar/claude-skills"
+
           git push origin master
