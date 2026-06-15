@@ -1,6 +1,6 @@
 param(
     [string]$HostName = "127.0.0.1",
-    [int]$Port = 8010,
+    [int]$Port = 18010,
     [string]$Backend = "transformers",
     [string]$ModelId = "opendatalab/MinerU2.5-Pro-2605-1.2B",
     [switch]$Preload,

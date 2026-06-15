@@ -12,7 +12,7 @@ from pathlib import Path
 def main() -> None:
     parser = argparse.ArgumentParser(description="Launch MinerU OCR API in the background.")
     parser.add_argument("--host", default="127.0.0.1")
-    parser.add_argument("--port", type=int, default=8010)
+    parser.add_argument("--port", type=int, default=18010)
     parser.add_argument("--backend", default="transformers", choices=["transformers", "vllm-engine"])
     parser.add_argument("--model-id", default="opendatalab/MinerU2.5-Pro-2605-1.2B")
     parser.add_argument("--preload", action="store_true")

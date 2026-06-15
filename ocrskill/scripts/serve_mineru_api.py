@@ -146,7 +146,7 @@ def main() -> None:
     parser.add_argument("--model-id", default=DEFAULT_MODEL_ID)
     parser.add_argument("--backend", default="transformers", choices=["transformers", "vllm-engine"])
     parser.add_argument("--host", default="127.0.0.1")
-    parser.add_argument("--port", type=int, default=8010)
+    parser.add_argument("--port", type=int, default=18010)
     parser.add_argument("--image-analysis", action="store_true")
     parser.add_argument("--allow-download", action="store_true", help="Allow Hugging Face network checks/downloads at load time.")
     parser.add_argument("--preload", action="store_true", help="Load the model before accepting requests.")
