@@ -13,7 +13,7 @@ from typing import Any
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from PIL import Image
 
-DEFAULT_MODEL_ID = "opendatalab/MinerU2.5-Pro-2604-1.2B"
+DEFAULT_MODEL_ID = "opendatalab/MinerU2.5-Pro-2605-1.2B"
 
 app = FastAPI(title="MinerU OCR API")
 _client_lock = threading.Lock()

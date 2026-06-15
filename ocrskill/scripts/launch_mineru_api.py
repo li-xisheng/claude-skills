@@ -14,7 +14,7 @@ def main() -> None:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8010)
     parser.add_argument("--backend", default="transformers", choices=["transformers", "vllm-engine"])
-    parser.add_argument("--model-id", default="opendatalab/MinerU2.5-Pro-2604-1.2B")
+    parser.add_argument("--model-id", default="opendatalab/MinerU2.5-Pro-2605-1.2B")
     parser.add_argument("--preload", action="store_true")
     parser.add_argument("--image-analysis", action="store_true")
     parser.add_argument("--allow-download", action="store_true")
