@@ -1,4 +1,4 @@
 interface:
   display_name: "OCR Skill"
-  short_description: "OCR PDF/DOCX/PPTX to ezkotae v2 outputs"
-  default_prompt: "Use $ocrskill to OCR this file or folder and produce Markdown, matching image files, *_images.json, layout JSON, and an optional DOCX."
+  short_description: "Run MinerU OCR over PDFs to DOCX"
+  default_prompt: "Use $ocrskill to OCR every PDF in this folder and produce JSON, layout images, and a DOCX."

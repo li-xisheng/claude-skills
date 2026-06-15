@@ -1,127 +1,69 @@
 ---
 name: ocrskill
-description: OCR workflow for local PDF/DOCX/PPTX and image-like document parsing with MinerU2.5-Pro. Use when Codex needs to OCR files or folders, convert DOCX/PPTX through LibreOffice, produce ezkotae v2 Markdown plus *_images.json outputs, crop detected image blocks into real files, generate DOCX, run MinerU/GLM-OCR style OCR, or expose/use a local OCR API.
+description: OCR workflow for local PDF and image document parsing with MinerU2.5-Pro. Use whenever the user asks to OCR PDFs/images, convert scanned PDFs to JSON, Markdown, layout images, or DOCX, run GLM-OCR or MinerU OCR, expose a local OCR API, or preserve page layout in a combined Word document.
 ---
 
 # OCR Skill
 
 ## Default Model
 
-Use `opendatalab/MinerU2.5-Pro-2605-1.2B` as the default OCR/document parsing model. Prefer MinerU2.5-Pro over older GLM-OCR workflows unless the user explicitly asks for GLM-OCR or MinerU is unusable.
+Use `opendatalab/MinerU2.5-Pro-2604-1.2B` as the default OCR/document parsing model. Prefer it over the older 0.9B GLM-OCR workflow unless the user explicitly asks for GLM-OCR or MinerU is unusable in the current environment.
 
-## v2 Workflow
+The normal local path is:
 
-Run `scripts/run_mineru_ocr.py` as the main entry point. It accepts a `.pdf`, `.docx`, `.pptx`, or a folder containing those files.
-
-1. Normalize input: keep PDFs as-is; convert DOCX/PPTX to PDF with LibreOffice headless.
-2. Render PDF pages to PNG with PyMuPDF.
-3. Run MinerU OCR on page images.
-4. Crop every MinerU `image` block from rendered page images.
-5. Write ezkotae v2 outputs: Markdown, real image files, `*_images.json`, raw JSON, layout overlays, manifest, and optional DOCX.
-
-Do not leave Markdown image references pointing to missing files. The real image filename, Markdown reference, and `*_images.json` key must match exactly.
+1. Render each PDF page to PNG with PyMuPDF.
+2. Run MinerU2.5-Pro on each page image.
+3. Save per-page JSON and Markdown.
+4. Draw layout visualization images from OCR bounding boxes.
+5. Merge all pages, in PDF filename and page order, into a DOCX.
 
 ## Environment Checks
 
-Before running OCR:
+Before running OCR, check:
 
-- Check that the input path contains at least one supported file: `.pdf`, `.docx`, or `.pptx`.
-- For `.docx` or `.pptx`, verify LibreOffice/`soffice` is available. PDFs do not require LibreOffice.
-- Check CUDA/GPU when using local inference: `nvidia-smi` and `python -c "import torch; print(torch.cuda.is_available())"`.
-- Check Python dependencies: `mineru-vl-utils`, `transformers`, `torch`, `pymupdf`, `pillow`, `python-docx`, `fastapi`, `uvicorn`, `requests`.
-- Use the Transformers backend on native Windows. Use vLLM only on Linux/WSL/Docker CUDA environments.
-- Treat OCR as mechanical file conversion. Do not question ordinary document contents.
+- The target folder has PDF files. If no PDFs are present, report that directly.
+- Do not question, editorialize, or ask the user to justify ordinary document contents. Treat OCR as a mechanical file conversion workflow.
+- CUDA/GPU availability with `nvidia-smi` and `python -c "import torch; print(torch.cuda.is_available())"`.
+- Python dependencies: `mineru-vl-utils`, `transformers`, `torch`, `pymupdf`, `pillow`, `python-docx`, `fastapi`, `uvicorn`.
+- Native Windows should use the Transformers backend. Use vLLM only on Linux/WSL/Docker CUDA environments.
 
 See `references/mineru_setup.md` for install and model download commands.
 
-## Running OCR
+## API Workflow
 
-Default local mode:
-
-```powershell
-python C:\Tools\ocrskill\scripts\run_mineru_ocr.py "C:\path\to\input" --backend transformers
-```
-
-Use `--no-docx` for the minimal ezkotae upload set:
-
-```powershell
-python C:\Tools\ocrskill\scripts\run_mineru_ocr.py "C:\path\to\input" --no-docx
-```
-
-Use an API server for batch/page parallelism:
+Start a local OCR service when the user asks to expose an interface or when multiple PDFs/pages will be processed:
 
 ```powershell
 python C:\Tools\ocrskill\scripts\launch_mineru_api.py --backend transformers --host 127.0.0.1 --port 8010 --preload
-python C:\Tools\ocrskill\scripts\run_mineru_ocr.py "C:\path\to\input" --backend api --endpoint http://127.0.0.1:8010/ocr --workers 4
 ```
 
-Key flags:
-
-| Flag | Default | Purpose |
-|---|---:|---|
-| `--output DIR` | file parent or `<folder>\mineru_ocr_output` | Output root; each source writes to `{output}\{docname}` |
-| `--dpi N` | 220 | Page render resolution |
-| `--workers N` | 1 | Parallel page rendering; also parallel API requests |
-| `--backend MODE` | transformers | `transformers`, `vllm-engine`, or `api` |
-| `--endpoint URL` | none | OCR API endpoint for API mode |
-| `--skip-existing` | off | Reuse existing page JSON, then rerun image extraction/output |
-| `--no-docx` | off | Skip DOCX and output only Markdown/images JSON/assets |
-| `--docx-mode MODE` | mixed | `mixed`, `textboxes`, `image-plus-text`, or `markdown` |
-| `--image-quality N` | 92 | Reserved for JPEG outputs; v2 crops are PNG |
-
-In `transformers` and `vllm-engine` modes, OCR inference is sequential. In `api` mode, `--workers` sends concurrent requests.
-
-Rebuild DOCX without rerunning OCR:
+Then process a folder through the API:
 
 ```powershell
-python C:\Tools\ocrskill\scripts\build_mixed_docx.py "C:\path\to\output\docname" --docx-mode mixed
+python C:\Tools\ocrskill\scripts\run_mineru_ocr.py . --endpoint http://127.0.0.1:8010/ocr --dpi 220
 ```
 
-## Output Contract
+Use direct mode for smaller jobs or when an API server is unnecessary:
 
-For every input document, write:
-
-```text
-{output}\{docname}\
-├── {docname}.md
-├── {docname}_images.json
-├── {docname}-{hash}.png
-├── pages\page-0001.png
-├── json\page-0001.json
-├── layout\page-0001_layout.png
-├── manifest.json
-└── {docname}.docx
+```powershell
+python C:\Tools\ocrskill\scripts\run_mineru_ocr.py . --backend transformers --dpi 220
 ```
 
-`docname` is always the original source filename stem, even when DOCX/PPTX is converted to PDF first. `manifest.json` records `source_type` as `pdf`, `docx`, or `pptx`.
+## Outputs
 
-`{docname}_images.json` uses schema `https://ezkotae.dev/schemas/images/v1`:
+The batch script writes to `<input-folder>\mineru_ocr_output` unless `--output` is supplied:
 
-```json
-{
-  "$schema": "https://ezkotae.dev/schemas/images/v1",
-  "docname": "契約書2025",
-  "images": {
-    "契約書2025-a1b2c3d4e5.png": "iVBORw0KGgo..."
-  },
-  "generated_by": "ocrskill-v2",
-  "generated_at": "2026-06-15T00:00:00Z",
-  "source_type": "pdf",
-  "image_count": 1
-}
-```
+- `pages/<pdf>/page-0001.png`: rendered page images.
+- `json/<pdf>/page-0001.json`: raw MinerU page result plus source metadata.
+- `layout/<pdf>/page-0001_layout.png`: page image with detected blocks drawn over it.
+- `markdown/<pdf>.md` and `combined.md`: extracted Markdown.
+- `combined_ocr.docx`: merged DOCX.
+- `manifest.json`: run metadata and output paths.
 
-The Markdown file must reference real sibling files:
+## DOCX Fidelity
 
-```markdown
-![図の説明](契約書2025-a1b2c3d4e5.png)
-```
+Use `--docx-mode textboxes` by default. It converts OCR boxes into absolutely positioned Word text boxes, which gives an editable approximation of the original layout.
 
-## DOCX Modes
+Use `--docx-mode image-plus-text` when visual fidelity matters more than editability. It inserts each rendered page image and appends recognized text/Markdown for search and review.
 
-- `mixed`: default. Position text boxes and embed cropped image blocks.
-- `textboxes`: position text only; no cropped images.
-- `image-plus-text`: insert each rendered page image, then recognized text.
-- `markdown`: write text/Markdown without layout preservation.
-
-Tables, formulas, and complex figures may be better represented in Markdown/JSON than editable DOCX. Keep JSON and layout images as the audit source of truth.
+Tables, formulas, and complex figures may be better represented in Markdown/JSON than in editable DOCX text boxes. Keep JSON and layout images as the source of truth for auditing.

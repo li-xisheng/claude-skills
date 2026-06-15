@@ -1,6 +1,6 @@
 # MinerU2.5-Pro Local Setup
 
-Model: `opendatalab/MinerU2.5-Pro-2605-1.2B`
+Model: `opendatalab/MinerU2.5-Pro-2604-1.2B`
 
 Use the Transformers backend on native Windows:
 
@@ -8,12 +8,10 @@ Use the Transformers backend on native Windows:
 python -m pip install "mineru-vl-utils[transformers]" pymupdf pillow python-docx fastapi uvicorn requests
 ```
 
-Install LibreOffice when OCR inputs may include `.docx` or `.pptx`. PDFs do not require LibreOffice.
-
 Pre-download the model into the Hugging Face cache:
 
 ```powershell
-python -c "from huggingface_hub import snapshot_download; snapshot_download('opendatalab/MinerU2.5-Pro-2605-1.2B')"
+python -c "from huggingface_hub import snapshot_download; snapshot_download('opendatalab/MinerU2.5-Pro-2604-1.2B')"
 ```
 
 Start the API:
@@ -24,10 +22,10 @@ python C:\Tools\ocrskill\scripts\launch_mineru_api.py --backend transformers --h
 
 The scripts default to local-cache loading after the model is downloaded. Add `--allow-download` only when network access should be used during model loading.
 
-Run a file or folder:
+Run a folder:
 
 ```powershell
-python C:\Tools\ocrskill\scripts\run_mineru_ocr.py C:\path\to\input --endpoint http://127.0.0.1:8010/ocr
+python C:\Tools\ocrskill\scripts\run_mineru_ocr.py C:\path\to\pdfs --endpoint http://127.0.0.1:8010/ocr
 ```
 
 Linux/WSL/Docker CUDA can use vLLM for higher throughput:
