@@ -17,9 +17,10 @@ Run `scripts/run_mineru_ocr.py` as the main entry point. It accepts a `.pdf`, `.
 2. Render PDF pages to PNG with PyMuPDF.
 3. Run MinerU OCR on page images.
 4. Crop valid MinerU `image` blocks from rendered page images.
-5. Write ezkotae v2 outputs: Markdown, real image files, `*_images.json`, raw JSON, layout overlays, manifest, and optional DOCX.
+5. Write ezkotae v2 outputs: Markdown, sibling image files, one document-level `*_images.json`, internal raw page JSON, layout overlays, manifest, and optional DOCX.
 
 Do not leave Markdown image references pointing to missing files. The real image filename, Markdown reference, and `*_images.json` key must match exactly.
+For website upload, use `{docname}.md`, `{docname}_images.json`, and the sibling `.jpg` files. The `json/page-*.json` files are internal MinerU raw OCR cache/audit artifacts and are not the upload image JSON.
 
 ## Environment Checks
 
@@ -93,10 +94,10 @@ For every input document, write:
 ```text
 {output}\{docname}\
 ├── {docname}.md
-├── {docname}_images.json
+├── {docname}_images.json        # one JSON per document; contains all image base64 entries
 ├── {docname}-{hash}.jpg
 ├── pages\page-0001.png
-├── json\page-0001.json
+├── json\page-0001.json          # internal raw page OCR cache, not upload payload
 ├── layout\page-0001_layout.png
 ├── manifest.json
 └── {docname}.docx
@@ -104,7 +105,7 @@ For every input document, write:
 
 `docname` is always the original source filename stem, even when DOCX/PPTX is converted to PDF first. `manifest.json` records `source_type` as `pdf`, `docx`, or `pptx`.
 
-`{docname}_images.json` uses schema `https://ezkotae.dev/schemas/images/v1`:
+`{docname}_images.json` is the only upload images JSON for the document. It uses schema `https://ezkotae.dev/schemas/images/v1` and contains every extracted image keyed by the same filename used in Markdown:
 
 ```json
 {
