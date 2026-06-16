@@ -66,7 +66,8 @@ def main() -> None:
 
     records = load_page_records(output_dir)
     repair_image_paths(records, output_dir)
-    ImageExtractor(docname, output_dir).extract(records)
+    image_quality = int(manifest.get("image_quality", 92))
+    ImageExtractor(docname, output_dir, image_quality).extract(records)
     write_docx(records, docx_path, args.docx_mode)
     print(f"Wrote {docx_path}")
 

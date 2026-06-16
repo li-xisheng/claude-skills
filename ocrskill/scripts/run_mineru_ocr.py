@@ -6,7 +6,7 @@ The v2 output layout is one directory per source document:
   <output>/<docname>/
     <docname>.md
     <docname>_images.json
-    <docname>-<hash>.png
+    <docname>-<hash>.jpg
     pages/page-0001.png
     json/page-0001.json
     layout/page-0001_layout.png
@@ -106,14 +106,27 @@ def find_libreoffice() -> str | None:
         if resolved:
             return resolved
 
-    windows_candidates = [
+    candidates = [
         Path(r"C:\Program Files\LibreOffice\program\soffice.exe"),
         Path(r"C:\Program Files (x86)\LibreOffice\program\soffice.exe"),
+        Path("/Applications/LibreOffice.app/Contents/MacOS/soffice"),
+        Path("/usr/bin/soffice"),
+        Path("/usr/bin/libreoffice"),
+        Path("/usr/local/bin/soffice"),
+        Path("/usr/local/bin/libreoffice"),
+        Path("/opt/homebrew/bin/soffice"),
+        Path("/opt/homebrew/bin/libreoffice"),
+        Path("/usr/lib/libreoffice/program/soffice"),
+        Path("/snap/bin/libreoffice"),
     ]
-    for candidate in windows_candidates:
+    for candidate in candidates:
         if candidate.exists():
             return str(candidate)
     return None
+
+
+def utc_now_z() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def converted_pdf_path(input_path: Path, output_dir: Path) -> Path:
@@ -608,9 +621,10 @@ def _image_vml(shape_id: str, relationship_id: str, x_pt: float, y_pt: float, w_
 
 
 class ImageExtractor:
-    def __init__(self, docname: str, output_dir: Path) -> None:
+    def __init__(self, docname: str, output_dir: Path, image_quality: int) -> None:
         self.docname = docname
         self.output_dir = output_dir
+        self.image_quality = image_quality
         self.images: dict[str, str] = {}
 
     def extract(self, page_records: list[dict[str, Any]]) -> dict[str, str]:
@@ -639,12 +653,12 @@ class ImageExtractor:
                     if x1 - x0 < 4 or y1 - y0 < 4:
                         continue
 
-                    cropped = page.crop((int(x0), int(y0), int(x1), int(y1)))
+                    cropped = page.crop((int(x0), int(y0), int(x1), int(y1))).convert("RGB")
                     buffer = io.BytesIO()
-                    cropped.save(buffer, format="PNG")
+                    cropped.save(buffer, format="JPEG", quality=self.image_quality, optimize=True)
                     image_bytes = buffer.getvalue()
                     hash10 = hashlib.sha256(image_bytes).hexdigest()[:10]
-                    key = f"{self.docname}-{hash10}.png"
+                    key = f"{self.docname}-{hash10}.jpg"
                     output_path = self.output_dir / key
                     output_path.write_bytes(image_bytes)
                     self.images[key] = base64.b64encode(image_bytes).decode("ascii")
@@ -688,7 +702,7 @@ def build_images_json(images: dict[str, str], docname: str, source_type: str) ->
         "docname": docname,
         "images": images,
         "generated_by": "ocrskill-v2",
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": utc_now_z(),
         "source_type": source_type,
         "image_count": len(images),
     }
@@ -904,7 +918,7 @@ def process_document(
         job,
     )
 
-    extractor = ImageExtractor(job.docname, job.output_dir)
+    extractor = ImageExtractor(job.docname, job.output_dir, image_quality)
     images = extractor.extract(page_records)
 
     md_path = write_markdown_file(page_records, job.output_dir, job.docname)
@@ -920,7 +934,7 @@ def process_document(
         write_docx(page_records, docx_path, docx_mode)
 
     manifest = {
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": utc_now_z(),
         "generated_by": "ocrskill-v2",
         "source_file": str(job.source_path),
         "source_type": job.source_type,
@@ -930,6 +944,7 @@ def process_document(
         "model_id": DEFAULT_MODEL_ID,
         "dpi": dpi,
         "workers": workers,
+        "image_format": "jpg",
         "image_quality": image_quality,
         "docx_mode": None if no_docx else docx_mode,
         "page_count": len(page_records),
@@ -987,14 +1002,14 @@ def main() -> None:
     parser.add_argument("--output", help="Output root. Defaults to <file-parent> or <folder>/mineru_ocr_output.")
     parser.add_argument("--model-id", default=DEFAULT_MODEL_ID)
     parser.add_argument("--backend", default="transformers", choices=["transformers", "vllm-engine", "api"])
-    parser.add_argument("--endpoint", help="Existing OCR endpoint, e.g. http://127.0.0.1:18010/ocr.")
+    parser.add_argument("--endpoint", help="Existing OCR endpoint, e.g. the endpoint printed by launch_mineru_api.py.")
     parser.add_argument("--dpi", type=int, default=220)
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--recursive", action="store_true")
     parser.add_argument("--skip-existing", action="store_true")
     parser.add_argument("--no-docx", action="store_true")
     parser.add_argument("--docx-mode", default="mixed", choices=["mixed", "textboxes", "image-plus-text", "markdown"])
-    parser.add_argument("--image-quality", type=int, default=92, help="Reserved for JPEG outputs; PNG crops are lossless.")
+    parser.add_argument("--image-quality", type=int, default=92, help="JPEG quality for extracted image crops.")
     parser.add_argument("--image-analysis", action="store_true")
     parser.add_argument("--allow-download", action="store_true", help="Allow Hugging Face network checks/downloads at load time.")
     args = parser.parse_args()
@@ -1007,6 +1022,8 @@ def main() -> None:
 
     if args.workers < 1:
         raise RuntimeError("--workers must be at least 1.")
+    if not 1 <= args.image_quality <= 100:
+        raise RuntimeError("--image-quality must be between 1 and 100.")
 
     if args.output:
         output_root = Path(args.output).resolve()
