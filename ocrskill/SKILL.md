@@ -127,6 +127,8 @@ The Markdown file must reference real sibling files:
 ![図の説明](契約書2025-a1b2c3d4e5.jpg)
 ```
 
+At the end of each run, read the printed `Upload set` summary to confirm the output location. It lists the output folder, Markdown path, `{docname}_images.json` path, sibling `.jpg` count, optional DOCX path, and manifest path. If console output is unavailable, open `{output}\{docname}\manifest.json`; it records `markdown_path`, `images_json_path`, `docx_path`, and `output_dir`.
+
 ## DOCX Modes
 
 - `mixed`: default. Position text boxes and embed cropped image blocks.

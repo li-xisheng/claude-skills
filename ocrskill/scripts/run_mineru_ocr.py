@@ -996,6 +996,20 @@ def make_recognizer(args: argparse.Namespace) -> tuple[ApiRecognizer | DirectRec
     )
 
 
+def print_output_summary(manifests: list[dict[str, Any]], output_root: Path) -> None:
+    print(f"Processed {len(manifests)} document(s) into {output_root}")
+    for manifest in manifests:
+        print("")
+        print(f"Output folder: {manifest['output_dir']}")
+        print("Upload set:")
+        print(f"  markdown: {manifest['markdown_path']}")
+        print(f"  images_json: {manifest['images_json_path']}")
+        print(f"  sibling_images: {manifest['image_count']} .jpg file(s) in {manifest['output_dir']}")
+        if manifest.get("docx_path"):
+            print(f"  docx: {manifest['docx_path']}")
+        print(f"  manifest: {manifest['manifest_path']}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="OCR PDFs, DOCX, and PPTX files with MinerU2.5-Pro.")
     parser.add_argument("input", nargs="?", default=".", help="PDF/DOCX/PPTX file or folder.")
@@ -1052,13 +1066,15 @@ def main() -> None:
             )
             manifest["recognizer"] = recognizer_mode
             manifest["model_id"] = args.model_id
+            manifest["output_dir"] = str(job.output_dir)
+            manifest["manifest_path"] = str(job.output_dir / "manifest.json")
             (job.output_dir / "manifest.json").write_text(
                 json.dumps(to_jsonable(manifest), ensure_ascii=False, indent=2),
                 encoding="utf-8",
             )
             run_manifests.append(manifest)
 
-    print(f"Processed {len(run_manifests)} document(s) into {output_root}")
+    print_output_summary(run_manifests, output_root)
 
 
 if __name__ == "__main__":
