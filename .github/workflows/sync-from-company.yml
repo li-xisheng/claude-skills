@@ -2,8 +2,8 @@ name: Sync from company repo
 
 on:
   schedule:
-    # Every 4 hours
-    - cron: "0 */4 * * *"
+    # Weekly, Monday 00:00 UTC
+    - cron: "0 0 * * 1"
   workflow_dispatch:
 
 permissions:
@@ -26,7 +26,10 @@ jobs:
           rm -rf /tmp/company-claude-skills
           git clone --depth 1 https://github.com/lxsWestar/claude-skills.git /tmp/company-claude-skills
 
-          rsync -a --delete \
+          # No --delete: this repo may hold skills that only exist here
+          # (personal backup), so files absent from the company repo are
+          # never removed — only added or updated.
+          rsync -a \
             --exclude='.git/' \
             --exclude='.github/workflows/' \
             /tmp/company-claude-skills/ ./
