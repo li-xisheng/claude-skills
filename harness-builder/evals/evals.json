@@ -1,0 +1,55 @@
+{
+  "skill_name": "harness-builder",
+  "evals": [
+    {
+      "id": 0,
+      "name": "build-midapp-harness",
+      "mode": "build",
+      "prompt": "这是我们的一个中型全栈项目（Vue3 前端在 src/，Express 后端在 server/，同一个仓库）。我最近用 Claude Code 老觉得它找不对文件、context 也容易爆。帮我给这个项目从零搭一套完整的 Claude Code harness。",
+      "fixture": "midapp",
+      "expected_output": "先侦察仓库现状；产出按搭建顺序的分层方案；给出根 CLAUDE.md（≤200行、只放指针与关键的坑）+ 子目录 CLAUDE.md 草稿、permissions.deny/忽略规则、代码库地图；点出最高 ROI 三件事；不一上来就堆 MCP；默认 plan-then-apply。",
+      "assertions": [
+        "产出了一份根 CLAUDE.md 草稿（实际文件或明确的拟定内容）",
+        "拟定的根 CLAUDE.md 不超过 200 行",
+        "建议分层：为 src/ 和 server/ 分别给出子目录 CLAUDE.md（而非把所有内容堆在根）",
+        "提出了权限/忽略边界（permissions.deny 或忽略生成目录/构建产物/第三方）",
+        "点出了最高 ROI 动作中至少两项（CLAUDE.md 砍到200行 / 子目录启动 / 装 LSP）",
+        "没有把接入 MCP 当作首要或第一步（MCP 不出现，或被明确放到最后一层）",
+        "遵循 plan-then-apply：先给出方案/征求确认，而不是默默把仓库全量改写"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "audit-bloated-harness",
+      "mode": "audit",
+      "prompt": "帮我体检一下这个项目现在的 Claude Code harness，特别是 CLAUDE.md 是不是有问题、有没有需要纠偏的地方，给我一份分优先级的整改建议。",
+      "fixture": "bloated",
+      "expected_output": "指出 CLAUDE.md 过长(>200行)、引用漂移、未分层、量化指标被 Goodhart 化、把战略/审美/周四禁忌写死的过度显形、权限薄弱；输出分优先级，每条现状→问题→建议→为什么。",
+      "assertions": [
+        "指出 CLAUDE.md 过长（超过约 200 行）",
+        "指出存在引用漂移（CLAUDE.md 引用了已不存在的文件，如 docs/ARCHITECTURE_v1.md、src/legacy/oldAuth.ts 等）",
+        "指出 CLAUDE.md 未分层（只有根、没有子目录）",
+        "指出量化指标被 Goodhart 化（覆盖率>85% / 函数<50行 / 圈复杂度 等被当作硬目标）",
+        "指出过度显形：把战略方向 / 审美 / “周四禁忌” 等本该留白的东西写成了硬规则",
+        "整改建议按优先级（高/中/低 或等价排序）组织",
+        "至少部分条目给出了理由（现状→问题→建议→为什么 或等价说明，而非只列结论）"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "operate-cross-cutting-refactor",
+      "mode": "operate",
+      "prompt": "我要把这个项目的用户认证从 session 改成 JWT，前后端加起来要动十几个文件。请按 Claude Code 的最佳实践帮我规划这个跨文件改动该怎么推进（我会自己执行）。",
+      "fixture": "midapp",
+      "expected_output": "建议子目录启动、先 Plan、派子 agent 探索、会话拆分、必要时 /batch/worktree、权限白名单；不盲目直接编辑。",
+      "assertions": [
+        "建议在子目录启动 Claude（而非仓库根）",
+        "建议先做 Plan / 方案先行，再实现（而非直接动手）",
+        "建议先派子 agent 探索现有 auth 实现、主 agent 保留干净 context",
+        "建议把跨大量文件的改动拆成多个会话（用 plan 文件做桥梁），而不是写更长的 prompt",
+        "提到 /batch、git worktree、或权限白名单（/permissions）中至少一项进阶手法",
+        "没有不做任何规划就直接开始盲目编辑十几个文件"
+      ]
+    }
+  ]
+}
