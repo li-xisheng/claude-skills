@@ -12,6 +12,7 @@ Personal collection of Claude Code skills. This is the primary/source-of-truth r
 | [consulting-proposal-docx](./consulting-proposal-docx/) | 咨询风格 Word 提案书 / 稟議書生成器。JSON-driven，含执行摘要 SCQA 框、对比矩阵、Phase 路线图、审批申请等标准章节 |
 | [harness-builder](./harness-builder/) | 为代码仓库搭建、运行并定期纠偏 Claude Code「harness」：分层 CLAUDE.md、Hooks、Skills、MCP、权限边界与判断标准。支持搭建(build)、按 harness 作业(operate)、定期纠偏(audit) 三种模式 |
 | [neat-freak](./neat-freak/) | 会话收尾时对项目文档、Agent 记忆与工作区规范进行审查、同步和清理 |
+| [write-natural-business-japanese](./write-natural-business-japanese/) | 中文稿件转自然商务日语。三层方法：镜像文章结构、脱离原句法重新表达、扫描同形异义汉语词与职场黑话陷阱 |
 
 ## Usage
 
