@@ -17,6 +17,7 @@ Personal collection of Claude Code skills. This is the primary/source-of-truth r
 | [grill-with-docs](./grill-with-docs/) | (Matt Pocock) grill-me 的文档增强版。拷问时对照领域词汇表 CONTEXT.md 与 ADR：磨尖术语、用代码核对口头理解、决策成形时就地更新文档 |
 | [brainstorming](./brainstorming/) | (Jesse Vincent / obra · superpowers) 把模糊想法共创成设计文档：一次一问、发散 2-3 方案再收敛、HARD-GATE 未批准不写码、大需求先拆解，产出设计文档并提交 git。已适配独立使用 |
 | [openspec-propose](./openspec-propose/) | (Fission-AI · OpenSpec) 按依赖顺序一步生成 proposal / specs / design / tasks 全套变更文档，schema 状态全绿才算完成。需要 openspec CLI |
+| [ten-step-learning](./ten-step-learning/) | (爱AI的大刘 · Daliu-Awesome-Skills) 十步学习法：五视角 STORM → 矛盾图谱 → 简报 → 自检 → 资源 → 阶梯 → 核心 20% → 题库 → 费曼 → 速查表，产出单文件学习 HTML。已重写优化：去除源仓库依赖、新增单步/交互教练模式、fragments + assemble.py 确定性组装 |
 
 ## Usage
 

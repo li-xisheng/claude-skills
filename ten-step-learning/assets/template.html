@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<!--
+  十步学习法 · 学习 HTML 模板外壳
+  =====================================================
+  这是「固定模板外壳」。用 scripts/assemble.py 把 fragments/ 下的片段填进
+  双花括号占位符，不要改动 CSS / 侧边栏 chrome / JS。占位符清单与每个片段的
+  组件写法见 references/template-guide.md。
+
+  设计契约（Sunlit greenhouse editorial）：
+    · 画布 Pale Sage #eef2e3 · 纸面 Paper White #fcfcfc · 品牌 Deep Forest #043f2e
+    · 单一强调色 Chartreuse Lime #c8f169 · 无阴影，靠 sage→forest→chartreuse 三层堆叠
+    · 标题 Fraunces 衬线(仅 36px+) · 正文/UI Inter · 圆角只用 4px 与 16px
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TOPIC}} · 十步学习法</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* ---- Colors (DESIGN tokens) ---- */
+  --pale-sage:#eef2e3; --paper-white:#fcfcfc; --ink-black:#000; --charcoal:#242423;
+  --deep-forest:#043f2e; --chartreuse:#c8f169; --forest-mid:#2a6f2b; --vivid-green:#78c51c;
+  /* ---- Fonts ---- */
+  --serif:'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+  --sans:'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* ---- Radii (only 4 & 16) ---- */
+  --r-sm:4px; --r-lg:16px; --r-pill:9999px;
+  --sidebar-w:296px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans); background:var(--pale-sage); color:var(--deep-forest);
+  font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
+}
+
+/* ============ SIDEBAR (Deep Forest inverted rail) ============ */
+.sidebar{
+  position:fixed; top:0; left:0; width:var(--sidebar-w); height:100vh;
+  background:var(--deep-forest); color:var(--paper-white);
+  display:flex; flex-direction:column; overflow-y:auto; z-index:20;
+}
+.sidebar__brand{padding:32px 24px 20px}
+.sidebar__eyebrow{
+  font-size:12px; font-weight:500; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--chartreuse); margin-bottom:12px;
+}
+.sidebar__title{
+  font-family:var(--serif); font-weight:400; font-size:30px; line-height:1.1;
+  letter-spacing:-.02em; color:var(--paper-white);
+}
+.sidebar__topic{font-size:13px; color:#cdd8c9; margin-top:8px; line-height:1.4}
+.nav{padding:8px 12px 32px; display:flex; flex-direction:column; gap:2px}
+.nav__group{
+  font-size:12px; font-weight:500; letter-spacing:.06em; text-transform:uppercase;
+  color:#8fae90; padding:16px 12px 6px;
+}
+.nav a{
+  display:flex; align-items:center; gap:10px; text-decoration:none;
+  color:#dbe6d8; font-size:14px; font-weight:500; padding:9px 12px; border-radius:var(--r-sm);
+  transition:background .15s,color .15s; line-height:1.25;
+}
+.nav a .idx{
+  flex:0 0 auto; width:22px; height:22px; border-radius:var(--r-sm);
+  display:grid; place-items:center; font-size:12px; font-weight:600;
+  background:rgba(255,255,255,.08); color:#dbe6d8;
+}
+.nav a:hover{background:var(--forest-mid); color:#fff}
+.nav a.active{background:var(--chartreuse); color:var(--ink-black); font-weight:600}
+.nav a.active .idx{background:rgba(0,0,0,.14); color:var(--ink-black)}
+
+/* ============ MAIN ============ */
+.main{margin-left:var(--sidebar-w); min-height:100vh}
+.wrap{max-width:1000px; margin:0 auto; padding:64px 56px 120px}
+.view{display:none; animation:fade .35s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---- Typography components ---- */
+.eyebrow{
+  font-size:13px; font-weight:500; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--deep-forest); margin-bottom:14px;
+}
+.eyebrow--accent{color:var(--forest-mid)}
+.display{
+  font-family:var(--serif); font-weight:400; letter-spacing:-.031em; line-height:.94;
+  font-size:clamp(48px,7vw,88px); color:var(--deep-forest);
+}
+.display--sm{font-size:clamp(38px,5vw,56px); letter-spacing:-.028em; line-height:1.02}
+.h-section{
+  font-family:var(--serif); font-weight:400; font-size:36px; letter-spacing:-.02em;
+  line-height:1.1; color:var(--deep-forest); margin-bottom:18px;
+}
+.lead{font-size:18px; line-height:1.55; color:var(--charcoal); max-width:64ch; margin-top:20px}
+.step-head{padding-bottom:36px; border-bottom:1px solid rgba(4,63,46,.14); margin-bottom:36px}
+.prose{font-size:16px; line-height:1.65; color:var(--deep-forest)}
+.prose p{margin:0 0 14px} .prose ul,.prose ol{margin:0 0 14px 20px} .prose li{margin:6px 0}
+.prose h4{font-family:var(--serif); font-weight:400; font-size:22px; margin:26px 0 10px; letter-spacing:-.01em}
+.prose strong{font-weight:600}
+.prose code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px;
+  background:var(--pale-sage); padding:2px 6px; border-radius:var(--r-sm)}
+
+/* ---- Cards ---- */
+.card{background:var(--pale-sage); border-radius:var(--r-lg); padding:24px}
+.card--paper{background:var(--paper-white); border:1px solid rgba(0,0,0,.08)}
+.card--forest{background:var(--deep-forest); color:var(--paper-white); border-radius:var(--r-lg); padding:24px}
+.card--forest .h-section,.card--forest .eyebrow{color:var(--paper-white)}
+.grid{display:grid; gap:16px}
+.grid--2{grid-template-columns:repeat(2,1fr)}
+.grid--3{grid-template-columns:repeat(3,1fr)}
+
+/* ---- Tags / badges ---- */
+.tag{display:inline-block; background:var(--chartreuse); color:var(--ink-black);
+  font-size:12px; font-weight:500; padding:3px 10px; border-radius:var(--r-sm)}
+.tag--sage{background:var(--pale-sage); color:var(--deep-forest)}
+.tag--pill{border-radius:var(--r-pill)}
+.tag--forest{background:var(--deep-forest); color:var(--paper-white)}
+
+/* ---- 学习结果 (always-on highlight) ---- */
+.takeaways{
+  background:var(--deep-forest); color:var(--paper-white); border-radius:var(--r-lg);
+  padding:28px 28px 24px; margin-bottom:28px;
+}
+.takeaways .eyebrow{color:var(--chartreuse); margin-bottom:16px}
+.takeaways ul{list-style:none; display:flex; flex-direction:column; gap:14px}
+.takeaways li{position:relative; padding-left:26px; font-size:16.5px; line-height:1.55; color:#eef3ea}
+.takeaways li::before{content:''; position:absolute; left:0; top:9px; width:11px; height:11px;
+  background:var(--chartreuse); border-radius:var(--r-sm)}
+.takeaways strong{color:#fff; font-weight:600}
+
+/* ---- Collapsible panels (输入 / 输出) ---- */
+.panel{border-radius:var(--r-lg); margin-bottom:16px; overflow:hidden; background:var(--paper-white);
+  border:1px solid rgba(0,0,0,.08)}
+.panel>summary{
+  list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+  padding:16px 22px; user-select:none;
+}
+.panel>summary::-webkit-details-marker{display:none}
+.panel-label{font-size:13px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--deep-forest)}
+.panel .chev{width:10px; height:10px; border-right:2px solid var(--forest-mid); border-bottom:2px solid var(--forest-mid);
+  transform:rotate(-45deg); transition:transform .2s}
+.panel[open] .chev{transform:rotate(45deg)}
+.panel-body{padding:4px 22px 24px}
+.panel--output>summary{background:var(--pale-sage)}
+.prompt-block{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px; line-height:1.6;
+  background:var(--deep-forest); color:#e7efe6; border-radius:var(--r-sm); padding:18px 20px;
+  white-space:pre-wrap; word-break:break-word;
+}
+.upstream{font-size:14px; color:var(--charcoal); margin-bottom:14px}
+.upstream .tag{margin-right:6px}
+
+/* ---- Persona cards (Step 1) ---- */
+.persona-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin:6px 0 4px}
+.persona{background:var(--paper-white); border:1px solid rgba(0,0,0,.08); border-radius:var(--r-lg); padding:22px}
+.persona__role{font-family:var(--serif); font-size:22px; font-weight:400; letter-spacing:-.01em; margin-bottom:4px}
+.persona__tag{font-size:12px; color:var(--forest-mid); font-weight:500; margin-bottom:14px}
+.persona__block{margin-top:12px}
+.persona__k{font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--forest-mid); margin-bottom:4px}
+.persona__v{font-size:14.5px; line-height:1.5; color:var(--deep-forest)}
+.persona__insight{margin-top:14px; background:var(--pale-sage); border-radius:var(--r-sm); padding:12px 14px; font-size:14px; line-height:1.5}
+.persona__insight .persona__k{color:var(--deep-forest)}
+
+/* ---- Contradiction graph / generic viz wrap (Step 2 & others) ---- */
+.viz{background:var(--paper-white); border:1px solid rgba(0,0,0,.08); border-radius:var(--r-lg);
+  padding:24px; margin:4px 0 8px}
+.viz svg{display:block; width:100%; height:auto}
+.viz__cap{font-size:13px; color:var(--charcoal); margin-top:14px; line-height:1.5}
+.legend{display:flex; flex-wrap:wrap; gap:16px; margin-top:14px; font-size:12.5px; color:var(--charcoal)}
+.legend span{display:inline-flex; align-items:center; gap:6px}
+.legend i{width:14px; height:0; border-top-width:2px; border-top-style:solid}
+
+/* ---- Learning ladder (Step 6) ---- */
+.ladder{display:flex; flex-direction:column-reverse; gap:12px; margin:6px 0}
+.rung{background:var(--pale-sage); border-radius:var(--r-lg); padding:18px 22px; position:relative}
+.rung:nth-child(1){margin-left:0}
+.rung__lv{font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--forest-mid)}
+.rung__name{font-family:var(--serif); font-size:22px; font-weight:400; margin:2px 0 6px}
+.rung__milestone{font-size:14px; color:var(--charcoal); line-height:1.5}
+.rung__milestone strong{color:var(--deep-forest); font-weight:600}
+
+/* ---- Flashcards (Step 8 question bank) ---- */
+.flash{border:1px solid rgba(0,0,0,.1); border-radius:var(--r-lg); background:var(--paper-white); margin-bottom:12px; overflow:hidden}
+.flash>summary{list-style:none; cursor:pointer; padding:18px 22px; display:flex; gap:12px; align-items:flex-start}
+.flash>summary::-webkit-details-marker{display:none}
+.flash__lv{flex:0 0 auto; font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+  color:var(--ink-black); background:var(--chartreuse); border-radius:var(--r-sm); padding:3px 8px; margin-top:2px}
+.flash__q{font-size:15.5px; font-weight:500; line-height:1.5; color:var(--deep-forest)}
+.flash__reveal{font-size:12px; color:var(--forest-mid); margin-left:auto; white-space:nowrap; align-self:center}
+.flash[open] .flash__reveal{display:none}
+.flash__a{padding:0 22px 20px; border-top:1px solid rgba(0,0,0,.07); margin-top:4px; padding-top:16px}
+.flash__a .persona__k{color:var(--forest-mid); margin-top:12px}
+.rubric{background:var(--pale-sage); border-radius:var(--r-sm); padding:12px 14px; margin-top:12px; font-size:13.5px; line-height:1.5}
+
+/* ---- Resource cards (Step 5) ---- */
+.res{background:var(--paper-white); border:1px solid rgba(0,0,0,.08); border-radius:var(--r-lg); padding:22px; margin-bottom:14px}
+.res__head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:6px}
+.res__name{font-family:var(--serif); font-size:22px; font-weight:400}
+.res__meta{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0}
+.res__k{font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--forest-mid); margin:12px 0 3px}
+.res__v{font-size:14.5px; line-height:1.5}
+.res a{color:var(--forest-mid); text-decoration:underline; text-underline-offset:2px}
+
+/* ---- Step map (intro) ---- */
+.stepmap{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; margin-top:8px}
+.stepmap a{text-decoration:none; background:var(--paper-white); border:1px solid rgba(0,0,0,.08);
+  border-radius:var(--r-lg); padding:20px; color:var(--deep-forest); transition:background .15s,transform .15s}
+.stepmap a:hover{background:var(--pale-sage); transform:translateY(-2px)}
+.stepmap__n{font-family:var(--serif); font-size:40px; line-height:1; color:var(--forest-mid)}
+.stepmap__t{font-weight:600; margin-top:12px; font-size:15px}
+.stepmap__d{font-size:13px; color:var(--charcoal); margin-top:6px; line-height:1.45}
+
+/* ---- CTA ---- */
+.cta{display:inline-flex; align-items:center; gap:8px; background:var(--chartreuse); color:var(--ink-black);
+  font-weight:500; font-size:15px; padding:11px 20px; border-radius:var(--r-sm); text-decoration:none; border:0; cursor:pointer;
+  transition:background .15s}
+.cta:hover{background:var(--forest-mid); color:#fff}
+.cta--ghost{background:transparent; border:1px solid var(--ink-black); color:var(--ink-black)}
+.cta--ghost:hover{background:var(--deep-forest); color:#fff; border-color:var(--deep-forest)}
+.quicklinks{display:flex; flex-wrap:wrap; gap:12px; margin-top:24px}
+
+/* ---- Mobile ---- */
+.menu-btn{display:none}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%); transition:transform .25s; box-shadow:none}
+  .sidebar.open{transform:none}
+  .main{margin-left:0}
+  .wrap{padding:80px 24px 100px}
+  .menu-btn{display:inline-grid; place-items:center; position:fixed; top:16px; left:16px; z-index:30;
+    width:44px; height:44px; border:0; border-radius:var(--r-sm); background:var(--deep-forest); color:#fff; cursor:pointer}
+  .grid--2,.grid--3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<button class="menu-btn" id="menuBtn" aria-label="菜单">☰</button>
+
+<!-- ==================== SIDEBAR ==================== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar__brand">
+    <div class="sidebar__eyebrow">十步学习法 · TEN-STEP</div>
+    <div class="sidebar__title">{{TOPIC}}</div>
+    <div class="sidebar__topic">五视角 STORM × 费曼闭环 · 从零到能与专业人士对谈</div>
+  </div>
+  <nav class="nav" id="nav">
+    <a href="#view-intro" data-view="view-intro"><span class="idx">◎</span>总览</a>
+    <div class="nav__group">开局 · 让观点打一架</div>
+    <a href="#view-1" data-view="view-1"><span class="idx">1</span>五视角 STORM</a>
+    <a href="#view-2" data-view="view-2"><span class="idx">2</span>矛盾图谱</a>
+    <a href="#view-3" data-view="view-3"><span class="idx">3</span>综合简报</a>
+    <a href="#view-4" data-view="view-4"><span class="idx">4</span>同行评审自检</a>
+    <div class="nav__group">吃透 · 定资源打基础</div>
+    <a href="#view-5" data-view="view-5"><span class="idx">5</span>资源筛选</a>
+    <a href="#view-6" data-view="view-6"><span class="idx">6</span>学习阶梯</a>
+    <a href="#view-7" data-view="view-7"><span class="idx">7</span>核心 20%</a>
+    <div class="nav__group">检验 · 考崩自己再补</div>
+    <a href="#view-8" data-view="view-8"><span class="idx">8</span>考到崩溃</a>
+    <a href="#view-9" data-view="view-9"><span class="idx">9</span>费曼循环</a>
+    <div class="nav__group">压缩 · 随用随取</div>
+    <a href="#view-10" data-view="view-10"><span class="idx">10</span>一页速查表</a>
+    <a href="#view-closing" data-view="view-closing"><span class="idx">∞</span>收尾闭环</a>
+  </nav>
+</aside>
+
+<!-- ==================== MAIN ==================== -->
+<main class="main">
+<div class="wrap">
+
+  <!-- ---------- 总览 ---------- -->
+  <section class="view active" id="view-intro">
+    <p class="eyebrow">十步学习法 · 一个完整的学习闭环</p>
+    <h1 class="display">{{TOPIC}}</h1>
+    <p class="lead">{{METHOD_INTRO}}</p>
+    <div style="margin:44px 0 18px"><p class="eyebrow eyebrow--accent">十步地图</p></div>
+    <div class="stepmap">{{STEP_MAP}}</div>
+  </section>
+
+  <!-- ---------- 第 1 步 ---------- -->
+  <section class="view" id="view-1">
+    <div class="step-head">
+      <p class="eyebrow">第 1 步 · 五视角 STORM</p>
+      <h1 class="display display--sm">{{STEP_1_TITLE}}</h1>
+      <p class="lead">{{STEP_1_PURPOSE}}</p>
+    </div>
+    <div class="takeaways"><p class="eyebrow">学习结果 · 该带走的</p>{{STEP_1_TAKEAWAYS}}</div>
+    {{STEP_1_VIZ}}
+    <details class="panel panel--output" open><summary><span class="panel-label">输出 · 原始产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_1_OUTPUT}}</div></details>
+    <details class="panel panel--input"><summary><span class="panel-label">输入 · 提示词与上游产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_1_INPUT}}</div></details>
+  </section>
+
+  <!-- ---------- 第 2 步 ---------- -->
+  <section class="view" id="view-2">
+    <div class="step-head">
+      <p class="eyebrow">第 2 步 · 矛盾图谱</p>
+      <h1 class="display display--sm">{{STEP_2_TITLE}}</h1>
+      <p class="lead">{{STEP_2_PURPOSE}}</p>
+    </div>
+    <div class="takeaways"><p class="eyebrow">学习结果 · 该带走的</p>{{STEP_2_TAKEAWAYS}}</div>
+    {{STEP_2_VIZ}}
+    <details class="panel panel--output" open><summary><span class="panel-label">输出 · 原始产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_2_OUTPUT}}</div></details>
+    <details class="panel panel--input"><summary><span class="panel-label">输入 · 提示词与上游产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_2_INPUT}}</div></details>
+  </section>
+
+  <!-- ---------- 第 3 步 ---------- -->
+  <section class="view" id="view-3">
+    <div class="step-head">
+      <p class="eyebrow">第 3 步 · 综合简报</p>
+      <h1 class="display display--sm">{{STEP_3_TITLE}}</h1>
+      <p class="lead">{{STEP_3_PURPOSE}}</p>
+    </div>
+    <div class="takeaways"><p class="eyebrow">学习结果 · 该带走的</p>{{STEP_3_TAKEAWAYS}}</div>
+    {{STEP_3_VIZ}}
+    <details class="panel panel--output" open><summary><span class="panel-label">输出 · 原始产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_3_OUTPUT}}</div></details>
+    <details class="panel panel--input"><summary><span class="panel-label">输入 · 提示词与上游产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_3_INPUT}}</div></details>
+  </section>
+
+  <!-- ---------- 第 4 步 ---------- -->
+  <section class="view" id="view-4">
+    <div class="step-head">
+      <p class="eyebrow">第 4 步 · 同行评审自检</p>
+      <h1 class="display display--sm">{{STEP_4_TITLE}}</h1>
+      <p class="lead">{{STEP_4_PURPOSE}}</p>
+    </div>
+    <div class="takeaways"><p class="eyebrow">学习结果 · 该带走的</p>{{STEP_4_TAKEAWAYS}}</div>
+    {{STEP_4_VIZ}}
+    <details class="panel panel--output" open><summary><span class="panel-label">输出 · 原始产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_4_OUTPUT}}</div></details>
+    <details class="panel panel--input"><summary><span class="panel-label">输入 · 提示词与上游产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_4_INPUT}}</div></details>
+  </section>
+
+  <!-- ---------- 第 5 步 ---------- -->
+  <section class="view" id="view-5">
+    <div class="step-head">
+      <p class="eyebrow">第 5 步 · 资源筛选</p>
+      <h1 class="display display--sm">{{STEP_5_TITLE}}</h1>
+      <p class="lead">{{STEP_5_PURPOSE}}</p>
+    </div>
+    <div class="takeaways"><p class="eyebrow">学习结果 · 该带走的</p>{{STEP_5_TAKEAWAYS}}</div>
+    {{STEP_5_VIZ}}
+    <details class="panel panel--output" open><summary><span class="panel-label">输出 · 原始产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_5_OUTPUT}}</div></details>
+    <details class="panel panel--input"><summary><span class="panel-label">输入 · 提示词与上游产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_5_INPUT}}</div></details>
+  </section>
+
+  <!-- ---------- 第 6 步 ---------- -->
+  <section class="view" id="view-6">
+    <div class="step-head">
+      <p class="eyebrow">第 6 步 · 学习阶梯</p>
+      <h1 class="display display--sm">{{STEP_6_TITLE}}</h1>
+      <p class="lead">{{STEP_6_PURPOSE}}</p>
+    </div>
+    <div class="takeaways"><p class="eyebrow">学习结果 · 该带走的</p>{{STEP_6_TAKEAWAYS}}</div>
+    {{STEP_6_VIZ}}
+    <details class="panel panel--output" open><summary><span class="panel-label">输出 · 原始产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_6_OUTPUT}}</div></details>
+    <details class="panel panel--input"><summary><span class="panel-label">输入 · 提示词与上游产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_6_INPUT}}</div></details>
+  </section>
+
+  <!-- ---------- 第 7 步 ---------- -->
+  <section class="view" id="view-7">
+    <div class="step-head">
+      <p class="eyebrow">第 7 步 · 2 小时啃下核心 20%</p>
+      <h1 class="display display--sm">{{STEP_7_TITLE}}</h1>
+      <p class="lead">{{STEP_7_PURPOSE}}</p>
+    </div>
+    <div class="takeaways"><p class="eyebrow">学习结果 · 该带走的</p>{{STEP_7_TAKEAWAYS}}</div>
+    {{STEP_7_VIZ}}
+    <details class="panel panel--output" open><summary><span class="panel-label">输出 · 原始产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_7_OUTPUT}}</div></details>
+    <details class="panel panel--input"><summary><span class="panel-label">输入 · 提示词与上游产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_7_INPUT}}</div></details>
+  </section>
+
+  <!-- ---------- 第 8 步 ---------- -->
+  <section class="view" id="view-8">
+    <div class="step-head">
+      <p class="eyebrow">第 8 步 · 考到崩溃（主动回忆题库）</p>
+      <h1 class="display display--sm">{{STEP_8_TITLE}}</h1>
+      <p class="lead">{{STEP_8_PURPOSE}}</p>
+    </div>
+    <div class="takeaways"><p class="eyebrow">学习结果 · 该带走的</p>{{STEP_8_TAKEAWAYS}}</div>
+    {{STEP_8_VIZ}}
+    <details class="panel panel--output" open><summary><span class="panel-label">输出 · 题库（点开题目显示参考答案）</span><span class="chev"></span></summary><div class="panel-body">{{STEP_8_OUTPUT}}</div></details>
+    <details class="panel panel--input"><summary><span class="panel-label">输入 · 提示词与上游产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_8_INPUT}}</div></details>
+  </section>
+
+  <!-- ---------- 第 9 步 ---------- -->
+  <section class="view" id="view-9">
+    <div class="step-head">
+      <p class="eyebrow">第 9 步 · 费曼循环</p>
+      <h1 class="display display--sm">{{STEP_9_TITLE}}</h1>
+      <p class="lead">{{STEP_9_PURPOSE}}</p>
+    </div>
+    <div class="takeaways"><p class="eyebrow">学习结果 · 该带走的</p>{{STEP_9_TAKEAWAYS}}</div>
+    {{STEP_9_VIZ}}
+    <details class="panel panel--output" open><summary><span class="panel-label">输出 · 分层费曼讲解</span><span class="chev"></span></summary><div class="panel-body">{{STEP_9_OUTPUT}}</div></details>
+    <details class="panel panel--input"><summary><span class="panel-label">输入 · 提示词与上游产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_9_INPUT}}</div></details>
+  </section>
+
+  <!-- ---------- 第 10 步 ---------- -->
+  <section class="view" id="view-10">
+    <div class="step-head">
+      <p class="eyebrow">第 10 步 · 一页速查表</p>
+      <h1 class="display display--sm">{{STEP_10_TITLE}}</h1>
+      <p class="lead">{{STEP_10_PURPOSE}}</p>
+    </div>
+    <div class="takeaways"><p class="eyebrow">学习结果 · 该带走的</p>{{STEP_10_TAKEAWAYS}}</div>
+    {{STEP_10_VIZ}}
+    <details class="panel panel--output" open><summary><span class="panel-label">输出 · 速查表</span><span class="chev"></span></summary><div class="panel-body">{{STEP_10_OUTPUT}}</div></details>
+    <details class="panel panel--input"><summary><span class="panel-label">输入 · 提示词与上游产物</span><span class="chev"></span></summary><div class="panel-body">{{STEP_10_INPUT}}</div></details>
+  </section>
+
+  <!-- ---------- 收尾闭环 ---------- -->
+  <section class="view" id="view-closing">
+    <p class="eyebrow">收尾 · 一条完整的线</p>
+    <h1 class="display display--sm">这十步，其实是一个闭环</h1>
+    <p class="lead">{{CLOSING_INTRO}}</p>
+    <div class="viz" style="margin-top:32px">{{LOOP_DIAGRAM}}</div>
+    <div class="card--forest" style="margin-top:24px">
+      <p class="eyebrow">最终可带走的交付物</p>
+      <div class="prose" style="color:#eef3ea">{{CLOSING_DELIVERABLES}}</div>
+      <div class="quicklinks">
+        <a class="cta" href="#view-3" data-view="view-3">读综合简报 →</a>
+        <a class="cta cta--ghost" href="#view-10" data-view="view-10" style="border-color:#fff;color:#fff">拿一页速查表 →</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<script>
+(function(){
+  var nav=document.getElementById('nav');
+  var links=[].slice.call(document.querySelectorAll('[data-view]'));
+  var views=[].slice.call(document.querySelectorAll('.view'));
+  var sidebar=document.getElementById('sidebar');
+  function show(id){
+    views.forEach(function(v){v.classList.toggle('active', v.id===id);});
+    document.querySelectorAll('#nav a').forEach(function(a){a.classList.toggle('active', a.dataset.view===id);});
+    if(window.innerWidth<=900) sidebar.classList.remove('open');
+    window.scrollTo({top:0,behavior:'auto'});
+  }
+  links.forEach(function(a){
+    a.addEventListener('click',function(e){
+      var id=a.dataset.view; if(!id) return;
+      e.preventDefault(); history.replaceState(null,'','#'+id); show(id);
+    });
+  });
+  document.getElementById('menuBtn').addEventListener('click',function(){sidebar.classList.toggle('open');});
+  var start=(location.hash||'#view-intro').slice(1);
+  if(document.getElementById(start)) show(start); else show('view-intro');
+})();
+</script>
+</body>
+</html>
