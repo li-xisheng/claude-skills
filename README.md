@@ -6,13 +6,17 @@ Personal collection of Claude Code skills. This is the primary/source-of-truth r
 
 | Skill | Description |
 |-------|-------------|
-| [effort-estimator](./effort-estimator/) | 工数估算（中日双语）。WBS/PERT/德尔菲/三维评估/NESMA/Planning Poker 等 10+ 方法，适配日本客户正式見積書格式 |
-| [ocrskill](./ocrskill/) | MinerU2.5-Pro OCR，用于本地 PDF/图片文档解析 |
-| [consulting-advisor](./consulting-advisor/) | 顶级咨询公司思考方法论。SCQA / MECE / 5 Whys / 金字塔原则 / 方案对比矩阵的 6 步分析流程，适用于内部说服与战略提案 |
-| [consulting-proposal-docx](./consulting-proposal-docx/) | 咨询风格 Word 提案书 / 稟議書生成器。JSON-driven，含执行摘要 SCQA 框、对比矩阵、Phase 路线图、审批申请等标准章节 |
-| [harness-builder](./harness-builder/) | 为代码仓库搭建、运行并定期纠偏 Claude Code「harness」：分层 CLAUDE.md、Hooks、Skills、MCP、权限边界与判断标准。支持搭建(build)、按 harness 作业(operate)、定期纠偏(audit) 三种模式 |
-| [neat-freak](./neat-freak/) | 会话收尾时对项目文档、Agent 记忆与工作区规范进行审查、同步和清理 |
-| [write-natural-business-japanese](./write-natural-business-japanese/) | 中文稿件转自然商务日语。三层方法：镜像文章结构、脱离原句法重新表达、扫描同形异义汉语词与职场黑话陷阱 |
+| [effort-estimator](./effort-estimator/) | (westarlsc) 工数估算（中日双语）。WBS/PERT/德尔菲/三维评估/NESMA/Planning Poker 等 10+ 方法，适配日本客户正式見積書格式 |
+| [ocrskill](./ocrskill/) | (westarlsc) MinerU2.5-Pro OCR，用于本地 PDF/图片文档解析 |
+| [consulting-advisor](./consulting-advisor/) | (westarlsc) 顶级咨询公司思考方法论。SCQA / MECE / 5 Whys / 金字塔原则 / 方案对比矩阵的 6 步分析流程，适用于内部说服与战略提案 |
+| [consulting-proposal-docx](./consulting-proposal-docx/) | (westarlsc) 咨询风格 Word 提案书 / 稟議書生成器。JSON-driven，含执行摘要 SCQA 框、对比矩阵、Phase 路线图、审批申请等标准章节 |
+| [harness-builder](./harness-builder/) | (westarlsc) 为代码仓库搭建、运行并定期纠偏 Claude Code「harness」：分层 CLAUDE.md、Hooks、Skills、MCP、权限边界与判断标准。支持搭建(build)、按 harness 作业(operate)、定期纠偏(audit) 三种模式 |
+| [neat-freak](./neat-freak/) | (卡兹克) 会话收尾时对项目文档、Agent 记忆与工作区规范进行审查、同步和清理 |
+| [write-natural-business-japanese](./write-natural-business-japanese/) | (westarlsc) 中文稿件转自然商务日语。三层方法：镜像文章结构、脱离原句法重新表达、扫描同形异义汉语词与职场黑话陷阱 |
+| [grill-me](./grill-me/) | (Matt Pocock) 11 行拷问 skill。对已有方案沿决策树逐个追问：一次一问、每问附推荐答案、能查代码就先查代码，直到达成共识 |
+| [grill-with-docs](./grill-with-docs/) | (Matt Pocock) grill-me 的文档增强版。拷问时对照领域词汇表 CONTEXT.md 与 ADR：磨尖术语、用代码核对口头理解、决策成形时就地更新文档 |
+| [brainstorming](./brainstorming/) | (Jesse Vincent / obra · superpowers) 把模糊想法共创成设计文档：一次一问、发散 2-3 方案再收敛、HARD-GATE 未批准不写码、大需求先拆解，产出设计文档并提交 git。已适配独立使用 |
+| [openspec-propose](./openspec-propose/) | (Fission-AI · OpenSpec) 按依赖顺序一步生成 proposal / specs / design / tasks 全套变更文档，schema 状态全绿才算完成。需要 openspec CLI |
 
 ## Usage
 
