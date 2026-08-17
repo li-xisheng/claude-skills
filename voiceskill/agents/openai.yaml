@@ -1,0 +1,4 @@
+interface:
+  display_name: "Voice Skill"
+  short_description: "Local multilingual TTS, voice cloning, and timestamped ASR"
+  default_prompt: "Use $voiceskill to synthesize or transcribe speech with the local Qwen voice APIs."

@@ -20,6 +20,7 @@ Personal collection of Claude Code skills. This is the primary/source-of-truth r
 | [goal-engineer](./goal-engineer/) | (卡兹克 leader × 向阳乔木 goal-meta 合并) 把模糊想法变成 agent 能独立长程执行的目标。两档同构：轻量档出 7 字段 /goal 指令（默认值优先、编号选择题），完整档走调研→提问→六节任务书→验收全流程，共享防作弊五死法、风险分级与暂停条件，附 lint 脚本 |
 | [ten-step-learning](./ten-step-learning/) | (爱AI的大刘 · Daliu-Awesome-Skills) 十步学习法：五视角 STORM → 矛盾图谱 → 简报 → 自检 → 资源 → 阶梯 → 核心 20% → 题库 → 费曼 → 速查表，产出单文件学习 HTML。已重写优化：去除源仓库依赖、新增单步/交互教练模式、fragments + assemble.py 确定性组装 |
 | [browser-control](./browser-control/) | (westarlsc 整合，含 BrowserAct 官方 skill v2.0.2) 浏览器操控统一入口。三通道路由：browser-act CLI（独立隔离浏览器，批量/验证码/人机协作）、chrome-devtools MCP（--autoConnect 连当前已登录 Chrome，DevTools 级调试）、Claude in Chrome 插件（claude --chrome 日常代办）。决策树选通道 + 冲突规则 + 跨通道安全总则。**安装后请删除旧的 browser-act 与 chrome-devtools 两个独立 skill，避免重复触发** |
+| [voiceskill](./voiceskill/) | (westarlsc) 本地 Qwen3-TTS / Qwen3-ASR 多语言语音服务：参考音频声音克隆、自动语言检测及词/字级时间戳输出 |
 
 ## Usage
 

@@ -52,6 +52,26 @@ claude --chrome        # 启动时开启浏览器集成
 - **硬限制**：不做股票交易、不绕过 CAPTCHA、不录入高度敏感数据。
 - 与通道 B 共同的建议：单开一个开发用 Chrome profile，别用装着网银/私人邮箱的日常 profile。
 
+## 本机现状（2026-08-17 实测，暂不可用）
+
+**结论：通道 C 在本机被账号前提挡住，与插件安装无关。** 需要时优先回退通道 B。
+
+已验证**正常**的部分（所以别再查这些）：
+- 插件已装；native host 全链路完好——注册表项 → `%APPDATA%\Claude Code\ChromeNativeHost\*.json`
+  → `~/.claude/chrome/chrome-native-host.bat` 三者齐全，`allowed_origins` 为官方扩展 ID
+  `fcoeoabgfenejglbffodgkkbkcdhcgfn`。
+
+**不满足**的两条（任一即导致不可用）：
+1. 环境变量设了 `ANTHROPIC_BASE_URL` + `ANTHROPIC_AUTH_TOKEN`，即非 claude.ai 订阅登录
+   → 按上文第 25 行，此功能被**强制关闭**，`--chrome` 也无效。
+   （`~/.claude.json` 里虽有 `oauthAccount` 字段，但环境变量优先，实际不走订阅。）
+2. Claude Code 版本 2.1.172 < 2.1.216 → 这种情况下**静默失败**，敲 `/chrome` 看不到明确报错，
+   表现为 `claude-in-chrome` MCP 始终不出现在工具列表里。
+
+**症状速判**：`/chrome` 无明显报错、但工具列表里没有 `claude-in-chrome` → 查这两条，别去查插件。
+
+**恢复条件**：改用 claude.ai 订阅账号登录（并清掉上述两个环境变量）+ 升级 Claude Code 至 2.1.216+。
+
 ## 排错（Windows 常见）
 
 - named pipe `EADDRINUSE` 冲突、native messaging host 崩溃：见官方 troubleshooting。

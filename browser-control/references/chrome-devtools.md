@@ -15,17 +15,59 @@
 
 ## 一次性前置（每台机器配一次）
 
-MCP 已写入全局 `~/.claude.json`（server 名 `chrome-devtools`；Windows 下实际结构为
-`command: "cmd"`, `args: ["/c", "npx", "-y", "chrome-devtools-mcp@latest", "--autoConnect"]`，
-即 `cmd /c` 包装的 `npx -y chrome-devtools-mcp@latest --autoConnect`）。启用步骤：
+MCP 写在 `~/.claude.json`（server 名 `chrome-devtools`）：
+
+```json
+{"command":"npx","args":["chrome-devtools-mcp@latest","--channel=stable","--autoConnect"]}
+```
+
+> **`--autoConnect` 必须搭配 `--channel` 或 `--userDataDir`，单独给不生效。**
+> 源码 `build/src/browser.js` 的分支条件是 `else if (channel || options.userDataDir)`；
+> 两者都缺时会掉进默认 `browserURL = http://127.0.0.1:9222` 分支，去请求 `/json/version`。
+> 而 Chrome 144+ 的新版远程调试**端口是随机的**（写在 profile 目录的 `DevToolsActivePort`
+> 文件里，每次启动都变）且**不再暴露 `/json/version`**（实测 404），于是必然连不上，
+> 报错还是含混的 `Could not connect to Chrome. Check if Chrome is running.`
+> 官方博客示例写的是 `--channel=beta`，那是 M144 未进稳定版时的写法；稳定版用 `stable`。
+
+启用步骤：
 
 1. **重启 Claude Code**（`/exit` 再启动），`/mcp` 确认 `chrome-devtools` 为 `connected`。
 2. **Chrome 端开启远程调试**：地址栏打开 `chrome://inspect/#remote-debugging`，
-   允许接收调试连接（需 Chrome 144+）。
+   允许接收调试连接（需 Chrome 144+）。**注意 `autoConnect` 不会替你启动 Chrome**，
+   Chrome 必须已在运行。
 3. **首次连接授权**：让 AI「给当前页面截图」时，Chrome 会弹授权框 → 点**允许**。
    连接中浏览器顶部会显示 *"Chrome is being controlled by automated test software"*。
 
 > 验证：让 AI「截一下当前页面」，能返回图就通了。
+
+## 降级链（连不上时按顺序往下退）
+
+四档都在 Windows + Chrome 151 + mcp v1.7.0 上实测通过。改 `~/.claude.json` 里
+`chrome-devtools` 的 `args`，改完**重启 Claude Code** 生效。
+
+| 档 | args | 登录态 | 适用 |
+|---|---|---|---|
+| **1（默认）** | `--channel=stable --autoConnect` | ✅ 复用 | 首选。无机器专属路径，可移植 |
+| **2** | `--userDataDir <profile 绝对路径> --autoConnect` | ✅ 复用 | 第1档找不到 profile，或用非默认/多 profile。路径即 `chrome://version` 的「个人资料路径」去掉尾部 `\Default` |
+| **3** | `--browserUrl http://127.0.0.1:9222` | ✅ 复用 | 前两档都失败。需**手动**以 `chrome.exe --remote-debugging-port=9222` 启动 Chrome（得先完全退出，托盘也退干净），走的是老式固定端口握手 |
+| **4** | `--isolated`（可加 `--headless`） | ❌ 无 | 兜底。MCP 自开全新隔离实例，与用户 Chrome 无关。做无状态诊断/抓取仍可用；需登录的任务改走通道 A 或 C |
+
+**命令行直接验证某一档**（不必改配置、不必重启）：
+
+```bash
+(echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"probe","version":"1"}}}'
+ echo '{"jsonrpc":"2.0","method":"notifications/initialized"}'
+ sleep 3
+ echo '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"list_pages","arguments":{}}}'
+ sleep 20) | timeout 45 npx -y chrome-devtools-mcp@latest --channel=stable --autoConnect 2>/dev/null | tail -c 800
+```
+
+返回里出现**用户真实标签页**即该档可用；只有 `about:blank` 说明连的是新实例（第4档行为）。
+
+### 换机器时
+
+第1档不含机器专属信息，通常直接可用。只有退到第2档才需要改路径（内含用户名）。
+若用 Edge：`--channel` 不适用，走第2档指向 Edge 的 profile 目录。
 
 ## 能做什么（常用 prompt）
 
@@ -53,9 +95,16 @@ MCP 已写入全局 `~/.claude.json`（server 名 `chrome-devtools`；Windows �
 
 ## 排错
 
+- **报 `Could not connect to Chrome. Check if Chrome is running.`（但 Chrome 明明开着）**：
+  典型症状是 `args` 里只有 `--autoConnect`。按上文补 `--channel=stable`，重启 Claude Code。
+  自查：`netstat -ano | findstr :9222` 无输出 + profile 目录下 `DevToolsActivePort` 里是别的端口
+  → 就是这个问题（说明 Chrome 用的是新版随机端口机制，而 MCP 在敲 9222）。
 - `/mcp` 显示未连接：确认已重启 Claude Code；`npx -y chrome-devtools-mcp@latest` 能联网拉包。
+  另外检查 `args` 首项是否被误写成 `cmd` 之类的包装（应为 `command: "npx"`）。
 - 截图无反应/超时：检查 `chrome://inspect/#remote-debugging` 已开，且授权框点了允许；Chrome 版本 ≥144。
 - 连不上想要的那个窗口：autoConnect 连的是当前活动 Chrome 实例；多 profile/多实例时只留目标实例开着。
+- **`list_pages` 只返回 `about:blank`**：连的是新开的隔离实例而非用户 Chrome。检查是否误用了
+  `--isolated`，或 remote debugging 开关没开导致回退。
 
 ## 参考
 
