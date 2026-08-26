@@ -6,3 +6,6 @@ venv/
 
 # Test artifacts
 /tmp/*.xlsx
+
+# skill-creator ワークスペース（テスト成果物・実戦検証ログはローカル保持）
+*-workspace/
