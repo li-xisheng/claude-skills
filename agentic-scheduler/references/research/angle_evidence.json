@@ -1,0 +1,116 @@
+{
+ "angle": "evidence",
+ "sources": [
+  {
+   "title": "Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity",
+   "url": "https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/",
+   "author": "Joel Becker, Nate Rush, Elizabeth Barnes, David Rein (METR)",
+   "date": "2025-07-10",
+   "kind": "report/blog (RCT研究)"
+  },
+  {
+   "title": "Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity (arXiv)",
+   "url": "https://arxiv.org/abs/2507.09089",
+   "author": "Becker et al. (METR)",
+   "date": "2025-07",
+   "kind": "paper"
+  },
+  {
+   "title": "We are Changing our Developer Productivity Experiment Design",
+   "url": "https://metr.org/blog/2026-02-24-uplift-update/",
+   "author": "METR",
+   "date": "2026-02-24",
+   "kind": "blog (方法论更新)"
+  },
+  {
+   "title": "DORA | State of AI-assisted Software Development 2025",
+   "url": "https://dora.dev/dora-report-2025/",
+   "author": "Google Cloud DORA team",
+   "date": "2025",
+   "kind": "report"
+  },
+  {
+   "title": "Key Takeaways from the DORA Report 2025",
+   "url": "https://www.faros.ai/blog/key-takeaways-from-the-dora-report-2025",
+   "author": "Faros AI",
+   "date": "2025-2026",
+   "kind": "blog (含Faros自有遥测数据)"
+  },
+  {
+   "title": "AI Copilot Code Quality: 2025 Data Suggests 4x Growth in Code Clones",
+   "url": "https://www.gitclear.com/ai_assistant_code_quality_2025_research",
+   "author": "GitClear",
+   "date": "2025",
+   "kind": "report"
+  },
+  {
+   "title": "The Maintainability Gap: 2026 AI Code Quality Research",
+   "url": "https://www.gitclear.com/the_ai_code_quality_maintainability_gap",
+   "author": "GitClear",
+   "date": "2026",
+   "kind": "report"
+  },
+  {
+   "title": "State of AI vs Human Code Generation Report",
+   "url": "https://www.coderabbit.ai/blog/state-of-ai-vs-human-code-generation-report",
+   "author": "CodeRabbit",
+   "date": "2025-12-17",
+   "kind": "report (470个真实PR分析)"
+  },
+  {
+   "title": "Amdahl's law for AI agents",
+   "url": "https://electric.ax/blog/2026/02/19/amdahls-law-for-ai-agents",
+   "author": "Electric.ax",
+   "date": "2026-02-19",
+   "kind": "blog"
+  },
+  {
+   "title": "The Amdahl's Law Problem in AI-Assisted Development",
+   "url": "https://www.connsulting.io/blog/amdahls-law",
+   "author": "Connsulting",
+   "date": "2025/2026",
+   "kind": "blog"
+  },
+  {
+   "title": "The Novelty Bottleneck: A Framework for Understanding Human Effort Scaling in AI-Assisted Work",
+   "url": "https://arxiv.org/abs/2603.27438",
+   "author": "Jacky Liang",
+   "date": "2026-03-28",
+   "kind": "paper"
+  },
+  {
+   "title": "Does GitHub Copilot improve code quality? Here's what the data says",
+   "url": "https://github.blog/news-insights/research/does-github-copilot-improve-code-quality-heres-what-the-data-says/",
+   "author": "GitHub",
+   "date": "2024-11",
+   "kind": "report/blog (RCT, 202名开发者)"
+  }
+ ],
+ "confirms": [
+  "METR 2025年RCT(16名资深开源开发者,246个真实issue,时薪150美元)精确量化了基线第5/9条的感知-现实裂口：开始前预测AI提速24%，任务完成后自评提速20%，但实测结果是变慢19%——39个百分点的感知与现实之差，是目前对'验证成本被低估、实现成本压缩被高估'最强的单点实证。[METR 2025]",
+  "DORA 2025报告(近5000名开发者调研)确认基线第6条'瓶颈从coding上移到review→test→integration→decision'：90%团队已用AI，AI与吞吐量正相关，但与交付稳定性负相关(除头部团队外)，测试/评审/QA被点名为'被AI暴露的下游瓶颈'。[DORA 2025]",
+  "Faros AI对上万名开发者的遥测数据，用一句话几乎是基线第6条的教科书式重述：'teams optimize locally—making code generation faster—while actual constraints shift to review, integration, and deployment'，但这次是用真实生产遥测(2025年1万+、2026年2.2万+开发者、4000+团队)而非调研问卷背书。[Faros AI]",
+  "GitHub官方RCT(202名≥5年经验开发者)与2024 SPACE研究(95名开发者，任务耗时从2h41m降到1h11m)确认'编码本身确实能被AI显著加速'——但这批研究同时也是基线第9条Amdahl逻辑的前提条件：编码提速快，是因为编码只是SDLC里被单独测量、单独提速的一环。[GitHub 2024]"
+ ],
+ "novel_ideas": [
+  "【新颖性瓶颈框架，Jacky Liang 2026】给出一个正式数学模型：人类工作总量不是随任务体量平滑降低的曲线，而是在'任务新颖分数ν'跨过阈值时发生断崖式相变——从O(E)(工作量随暴露度E线性增长)骤变为O(1)(可摊销、不再随规模增长)。更强的AI只会改变系数、不改变这个指数关系；组织的最优团队规模会随AI能力提升而缩小；墙钟时间理论上可靠并行压到O(√E)，但人类投入的工作总量仍保持O(E)不变。这比基线第5/10条(不确定性成本、探索预算)更进一步：它给出了一个可判定'某类探索型任务什么时候会突然变得可完全外包给AI'的量化变量——不是任务大小，而是新颖度本身。也解释了为什么'多开几个并行agent'压缩的只是日历时间，压缩不了人类判断的总工作量。[arXiv 2603.27438]",
+  "【Amdahl定律的显式agent公式化，Electric.ax 2026】把基线第9条的Amdahl逻辑写成 Speedup_max = 1/H（H=需要人类判断的工作占比），给出具体对照表：H=50%→最大2x，H=30%→3.3x，H=20%→5x，H=10%→10x，H=5%→20x。这可以直接拿来反推：给定当前团队'需要人类判断的任务占比'，就能算出并行agent数量的理论上限，比基线'并行度上限=可自动验证比例×review带宽'的定性描述多了一个可以直接套的公式。同时提出'自我了结型干预(self-liquidating intervention)'概念——每次人类判断必须产出一个能防止未来同类判断再次发生的制品(spec/test/文档)，并用'复现率(recurrence rate)'衡量系统是否真的在把人类判断转化为可复用资产。这是对基线第12条'减少人类决策拍板次数'第一次给出的具体操作化方法。[electric.ax]",
+  "【METR 2026: RCT本身正在方法论性失效】2026年2月METR公开承认放弃原有实验设计——因为越来越多开发者拒绝被随机分到'禁止用AI'组(不愿意不用AI工作)，导致'无AI对照组'样本严重自选偏差；同时时薪从150降到50美元又引入新的招募偏差。这是基线完全没涉及的元层面观点：随着AI渗透率越过某个阈值，'测量AI到底提速多少'这件事本身在实验设计上会变得越来越困难，因为再也找不到干净的'无AI基线'作对照。这对'如何估算工期'的启示是：未来估算校准很难再依赖学术式RCT基准，只能转向持续在线校准(呼应基线第8条的P50/P80/P95动态ETA范式，但理由从'工程实践更好'变成了'干净实验已经做不出来了')。[METR 2026]",
+  "【DORA 2025七种团队原型：AI是放大镜，'速度与稳定性对立'是伪命题】把团队聚类成7种原型(Harmonious High-Achievers 20%、Pragmatic Performers 20%、Stable and Methodical 15%、Constrained by Process 17%、Legacy Bottleneck 11%、High Impact/Low Cadence 7%、Foundational Challenges约10%)。头部40%的团队(前两类)证明吞吐量与稳定性可以同时高——'AI加速必然牺牲稳定性'只在组织能力不足的团队里成立；'Legacy Bottleneck'型团队用AI写代码更快，但陈旧的部署/集成系统把这些收益全部吃掉。这是对基线第6/9条的重要复杂化：AI对工期/质量的影响不是普适系数，而是当前组织能力的乘数，意味着估算模型本身需要按'团队原型/成熟度'分层校准，而不是套用统一的Amdahl系数。[DORA 2025]",
+  "【CodeRabbit首次把'验证成本'拆解到缺陷类型颗粒度】(2025年12月，470个真实PR，320个AI协作+150个纯人工) AI生成代码平均每PR有10.83个问题 vs 人类6.45个(约1.7倍)，90分位数上AI PR问题数达26个(人类基线的两倍多)；分类看：逻辑/正确性错误+75%、可读性问题3倍、安全漏洞最高2.74倍、格式问题2.66倍。这第一次把基线第5条'验证成本不随实现成本同比压缩'拆解到'具体哪几类缺陷在膨胀'的颗粒度——恰恰是逻辑正确性和安全这两类最需要人类深度判断、最难被CI/lint自动兜底的缺陷涨得最猛，直接支撑基线第6条'自动可验证比例决定并行度上限'的论断，且给出了具体系数(1.4x更多critical issue，1.7x更多major issue)。[CodeRabbit 2025]",
+  "【Faros AI纵向数据：个体-组织裂口在逐年恶化而非趋稳】2025年数据：任务完成+21%、PR合并+98%，但PR评审时间+91%(另一篇引用为+51.3%~+154%不等，各文章口径不一)；到2026年最新遥测：PR评审首次响应中位时间+156.6%，评审总耗时+199.6%，每PR事故率+242.7%。也就是说'个体加速、组织交付停滞'这个裂口不是一次性冲击后趋于稳定，而是逐年在扩大——这是基线第6条第一次拿到的纵向(2025→2026同源机构追踪)恶化趋势证据，而不只是单点快照对比。[Faros AI]",
+  "【GitClear纵向数据：重构信号消失速度远超预期】'移动代码占比'(重构信号)从2022年21%一路跌到2026上半年3.8%，'复制粘贴代码占比'从2022年9.4%涨到2026上半年15.7%，'重构 vs 复制粘贴'的选择比例已经变成约1:5。这提示：即使短期任务按时交付、Critical Path估算看起来准确，代码库层面的'可维护性负债'其实在指数积累——如果估算方法不把'未来返工/重构'计入Validation/Critical Path，会系统性低估中长期成本，这是基线里没有的一个'延迟显现的隐性成本'维度。[GitClear 2026]"
+ ],
+ "counter_points": [
+  "DORA 2025最重要的反直觉发现：并非所有团队AI都会拖慢交付稳定性——头部40%的团队(Harmonious High-Achievers + Pragmatic Performers)同时做到高吞吐+高稳定，说明'AI提速必然牺牲质量/拖慢关键路径'不是普遍规律，而是组织能力欠缺的产物。这要求给基线第6/9条加一个限定词：'瓶颈上移'和'整体只提速~2倍(Amdahl)'这类结论更适用于中低成熟度团队；头部团队(善于自动验证、流程清晰)可能把这个系数做得远高于平均值。[DORA 2025]",
+  "METR 2026后续追踪数据显示效应量高度不稳定且依场景而异：'原参与者二次参与'实测提速为-18%(置信区间-38%~+9%，仍以减速为主)，但'新招募、覆盖更多绿地/中小型仓库的开发者'实测提速仅-4%(置信区间-15%~+9%，接近零、不显著)。这意味着'AI让人变慢'这个结论对'资深工程师在自己极熟悉的成熟大型代码库上工作'这一特定场景成立度更高，外推到'新手在绿地/新代码库'场景时效应显著减弱甚至消失——是对基线笼统套用'AI提速被高估19%'这个数字的一个重要边界警示，估算方法论应区分'代码库成熟度/开发者熟悉度'这个维度再校准系数。[METR 2026]",
+  "METR团队自陈的方法论危机反过来支持基线第8条，但给出了一个基线没有的理由：不是'工程实践上P50/P80/P95动态ETA更好'，而是'干净的无AI对照实验在AI渗透率越来越高的现实中已经越来越难做出来了'——所以只能退而求其次，靠持续在线校准而非一次性学术基准来估算。这是对基线第8条支持理由的一次补充/修正，而非单纯确认。[METR 2026]"
+ ],
+ "notable_quotes": [
+  "Armin Ronacher (Flask创建者，via Electric.ax，2026): \"I sometimes kick off parallel agents, but not as much as I used to do. The thing is: it's only so much my mind can review!\"",
+  "Faros AI (关于局部优化失效): \"teams optimize locally—making code generation faster—while actual constraints shift to review, integration, and deployment.\"",
+  "METR研究团队 (2026-02-24更新，解释为何放弃原实验设计): \"we observed a significant increase in developers choosing not to participate in the study because they do not wish to work without AI, which likely biases downwards their estimate of AI-assisted speedup.\"",
+  "David Loker, Director of AI @ CodeRabbit (2025-12): \"These findings reinforce what many engineering teams have sensed throughout 2025... AI coding tools increase output, but they also introduce predictable, measurable weaknesses that organizations must actively mitigate.\"",
+  "DORA 2025报告核心框架句(经多家二次引用转述): AI's primary role is as an amplifier, \"magnifying an organization's existing strengths and weaknesses\" — 常被引申为'AI不创造精英组织，而是加冕(anoints)它们'。"
+ ]
+}

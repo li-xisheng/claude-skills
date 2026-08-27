@@ -26,7 +26,8 @@ description: >
    快变量（模型能力、加速倍数、可自动验证比例）**一个都不许写死**——现场采集、
    2-4 周短窗校准、旧数据衰减。任何来自文献或记忆的加速数字只能当方向证据。
 2. **探测优先**：能让 agent 试跑 30-60 分钟的任务，不要花 30 分钟猜。实测 > 估算。
-3. **队列纪律为中枢**：真正的瓶颈是人的验证注意力。验证队列 WIP 上限、
+3. **队列纪律为中枢**：管住**当前约束环节**——今天通常是人的验证注意力，且瓶颈会随
+   AI 能力迁移（estimate the current constraint, not yesterday's）。验证队列 WIP 上限、
    reviewer 利用率 ≤80%、保留 ~20% 应急容量。管好队列比估准数字更能缩短交付。
 4. **数字必须带来源等级**：`实测` / `历史校准` / `推导` / `猜` 四级，禁止无标注的数字。
 5. **一个模型三种视图**：内部预测 ≠ 运营看板 ≠ 対外承诺。
@@ -119,6 +120,8 @@ ETA 变化像 GPS 导航：有依据的修订是预测系统在正常工作，�
   任何单指标都会被 hack。
 - **别打磨 spec 排版**：实证显示指令文件的大小/结构/位置对遵循率无影响，
   显著的是任务/会话长度——投资方向是把任务切小，不是把文档写漂亮。
+- **本 skill 的数字也不是自然定律**：80% 红线、20% 应急块、3-5 路并行、30-60 分钟探测
+  都是经验值——同样服从来源等级纪律，有团队实测就用实测覆盖。
 
 ## References（何时读哪份）
 
@@ -126,5 +129,6 @@ ETA 变化像 GPS 导航：有依据的修订是预测系统在正常工作，�
 |---|---|
 | [references/methodology.md](references/methodology.md) | 需要论证依据、向人解释「为什么这么排」、质疑某条规则的出处时 |
 | [references/validation-record.md](references/validation-record.md) | 质疑方法论本身可靠性时（三路检验的完整留档） |
+| [references/derivation-record.md](references/derivation-record.md) | 被问「这条规则凭什么/推导过程能复核吗」时（推导链+8角度原始调查数据在 research/） |
 | [references/mechanisms.md](references/mechanisms.md) | 落地任何机制的操作细节：探测协议、校准、队列规则、状态文件模板 |
-| [references/external-layer.md](references/external-layer.md) | 出対外承诺文档、日本客户見積、应对「为什么还要这么久」时 |
+| [references/external-layer.md](references/external-layer.md) | 出対外承诺文档、日本客户見積、被要求出 WBS 时、应对「为什么还要这么久」时 |

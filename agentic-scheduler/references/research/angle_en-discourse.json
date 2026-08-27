@@ -1,0 +1,139 @@
+{
+ "angle": "en-discourse",
+ "sources": [
+  {
+   "title": "Story Points Stopped Working the Day AI Started Writing Code",
+   "url": "https://sahaj.ai/story-points-stopped-working-the-day-ai-started-writing-code/",
+   "author": "Sahaj Software",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "The Novelty Bottleneck: A Framework for Understanding Human Effort Scaling in AI-Assisted Work (arXiv:2603.27438)",
+   "url": "https://arxiv.org/abs/2603.27438",
+   "author": "Jacky Liang",
+   "date": "2026-03",
+   "kind": "paper"
+  },
+  {
+   "title": "Agentic Engineering Patterns",
+   "url": "https://simonw.substack.com/p/agentic-engineering-patterns",
+   "author": "Simon Willison",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "Are AI agents actually slowing us down?",
+   "url": "https://newsletter.pragmaticengineer.com/p/are-ai-agents-actually-slowing-us",
+   "author": "Gergely Orosz",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "Building OpenCode with Dax Raad",
+   "url": "https://newsletter.pragmaticengineer.com/p/opencode",
+   "author": "Gergely Orosz (interviewing Dax Raad)",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "The Death of Story Points - How AI Finally Makes Agile Work",
+   "url": "https://www.geoffmcqueen.com/the-death-of-story-points-how-ai-finally-makes-agile-work/",
+   "author": "Geoff McQueen",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "Does AI Make the Agile Manifesto Obsolete?",
+   "url": "https://www.infoq.com/news/2026/02/ai-agile-manifesto-debate/",
+   "author": "InfoQ",
+   "date": "2026-02",
+   "kind": "report"
+  },
+  {
+   "title": "Evolving software delivery for agentic AI (Intent Design / Zones of Intent)",
+   "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-operationalizing-agentic-ai/software-delivery.html",
+   "author": "AWS Prescriptive Guidance",
+   "date": "2026",
+   "kind": "tool-doc"
+  },
+  {
+   "title": "The Code Agent Orchestra - what makes multi-agent coding work",
+   "url": "https://addyosmani.com/blog/code-agent-orchestra/",
+   "author": "Addy Osmani",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "I Didn't Become a Developer to Review AI Slop",
+   "url": "https://www.builder.io/blog/developers-drowning-in-ai-prs",
+   "author": "Builder.io",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "Agentic Uncertainty Reveals Agentic Overconfidence (arXiv:2602.06948)",
+   "url": "https://arxiv.org/abs/2602.06948",
+   "author": "Jean Kaddour et al.",
+   "date": "2026-02",
+   "kind": "paper"
+  },
+  {
+   "title": "Early-Stage Prediction of Review Effort in AI-Generated Pull Requests (arXiv:2601.00753)",
+   "url": "https://arxiv.org/html/2601.00753v1",
+   "author": "(academic, arXiv preprint)",
+   "date": "2026-01",
+   "kind": "paper"
+  },
+  {
+   "title": "Ask HN: How do you give estimates in the age of Agentic coding",
+   "url": "https://news.ycombinator.com/item?id=48076443",
+   "author": "Hacker News (nibbleyou et al.)",
+   "date": "2026-05",
+   "kind": "forum"
+  },
+  {
+   "title": "AI Is Breaking Code Review: How Engineering Teams Fix the PR Bottleneck (aggregates LinearB/CircleCI/Faros/Sonar 2026 data)",
+   "url": "https://blog.codacy.com/ai-breaking-code-review-how-engineering-teams-survive-pr-bottleneck",
+   "author": "Codacy blog",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "Story Points Are Dying - Welcome to the Era of Prompt Points",
+   "url": "https://medium.com/@amitkalghatgi/story-points-are-dying-welcome-to-the-era-of-prompt-points-75d31e44bf9c",
+   "author": "Amit Kalghatgi",
+   "date": "2026",
+   "kind": "blog"
+  }
+ ],
+ "confirms": [
+  "瓶颈从「写代码」转移到「审查/验证」是英语工程社区2026年的共识级判断，且有实测数据支撑：Sahaj Software报告AI辅助的story diff规模增长154%、人工审查时间增长91%；LinearB 2026基准报告显示agentic AI生成的PR「pickup time」比无AI辅助的PR长5.3倍；Sonar 2026报告96%的开发者不完全信任AI生成代码、38%认为审查AI代码比审查人写代码更费力（经Codacy博客汇总）。这比基线的定性判断多了具体量化数字，直接支持基线第2、6条。",
+  "并行Agent数量上限=人的review带宽，这一点被Addy Osmani《The Code Agent Orchestra》明确给出经验数字：3-5个并行agent是「甜蜜点」，超过后协调开销指数增长而token成本只是线性增长；HN一线工程师评论也印证「natural bottleneck是我能多快review结果」，多开几个agent只会让自己更落后于审查队列。与基线第6条高度吻合，且给出了具体的数字区间(3-5)。",
+  "「拆任务/写spec的人前置判断」机制在Addy Osmani处被总结为「delegate the tasks, not the judgment」和「Your spec is the leverage」——agent处理有明确通过/失败标准的范围工作，人类保留架构决策权，高质量spec的价值在多agent时代被放大而非削弱。这是对基线第12条「会拆任务的人5-10x，机理是把判断前置到规划阶段」的独立确认，且换了一套术语体系。",
+  "Amdahl定律式的「编码提速但整体提速有限」在真实生产数据中被观察到，甚至比基线第9条的~2x更极端：CircleCI 2026数据显示功能分支(feature branch)吞吐量同比增长59%，但中位数团队的主干分支(main branch)吞吐量反而下降——说明集成/合并瓶颈不仅稀释了加速效果，对「中位数」团队而言净交付速度甚至可能不增反降。"
+ ],
+ "novel_ideas": [
+  "【最重要】Sahaj Software提出完整的替代估算框架「Residual Attention Estimation」（残差注意力估计），核心原则是「估计AI消除不掉的那部分工作」，即人类的审查/协调/风险判断，而非代码本身。具体机制包括：①「Readiness Gate」——需求不清晰、方案未收敛的story不给数字，直接转为1-3天限时spike（这是基线第10条「探索预算」的可操作实现）；②唯一估计问题从「这个代码多复杂」改为「我从头到尾读完/审完/测完/协调完这个改动需要多少专注人类注意力」，用S(1)/M(3)/L(8)三档，禁止XL（AI让薄切割变便宜，必须拆分）；③冲刺规划新增「验证WIP限制」——限制卡在「等待审查/测试」阶段的story数量，而不只是限制开发中WIP，直接针对「十个story都差不多完成但都卡在review」这一病症；④里程碑用吞吐量历史做蒙特卡罗模拟给出置信度日期（如「50%置信度3月3日，85%置信度3月24日」），随AI工具进化自动调整，无需重新估计；⑤最有新意的一点：在需求梳理阶段就让AI agent对每个story做「dry run」——在真实代码库上试跑一遍，报告六个真实驱动因素（审查负荷、认知负荷、爆炸半径、测试负担、协调成本、风险不可逆性），使「Planning变成Audit」——人类只需验证或反驳AI给出的判断，而不是从零猜测。",
+  "Jacky Liang的《The Novelty Bottleneck》(arXiv:2603.27438)给出了一个正式的数学模型，把基线第9条的「Amdahl定律直觉」严格公式化：设任务中「新颖」（agent先验未覆盖）部分占比为ν，则人类总投入的scaling行为不是平滑的次线性曲线，而是在ν趋近于0时从O(E)骤然跳变到O(1)，中间不存在过渡区间；更强的agent只能改变人类投入的系数(coefficient)，改变不了增长的指数(exponent)；团队并行可以把「墙钟时间(wall-clock time)」压到O(√E)，但「总人力投入」始终保持O(E)不变——即可以用并行换工期，但换不掉总人力成本；且随agent能力提升，组织的最优团队规模应该缩小而不是扩大。这给「工作量大≠排期长」提供了此前基线里没有的严格数学骨架。",
+  "AWS 2026年发布的prescriptive guidance提出用「Intent Design」和「Zones of Intent」取代传统Sprint Planning：不再逐步脚本化define→build→test→release，而是为agent划定一个「可在约束内自主行动的有界空间」，人类只需定义what(期望结果)、why(意图)、guardrails(约束/策略/信任边界)，how交给agent自己判断；用「行为是否符合意图」取代「验收标准是否逐项达成」来定义done；并明确指出「基于story完成度的velocity追踪、严格验收标准、确定性冲刺规划」这些agile实践在此模型下变得less useful。这是一套此前基线完全没有涉及的治理层框架，而非估算技巧层面的调整。",
+  "Kent Beck在这场辩论中提出的「augmented coding」vs「vibe coding」区分，本质是把估算问题重新定义为一个「价值观/纪律选择」而非纯数学问题：augmented coding指AI处理打字这类体力活，人类坚持清洁代码、完整测试、谨慎设计等传统工程价值观（他本人用TDD构建了生产级Rust/Python B+树库来演示）；vibe coding则依赖AI自行修复错误、忽视代码质量。这提示：同样的「4个数字估算法」在两种纪律下的准确度可能天差地别，估算模型本身可能需要先声明「这个任务走的是哪种编码纪律」作为前置变量。",
+  "Jean Kaddour等人的《Agentic Uncertainty Reveals Agentic Overconfidence》(arXiv:2602.06948)发现agent系统性高估自己的成功率：某些实际成功率只有22%的agent会预测自己有77%的成功概率（不同模型基准成功率不同：GPT 35%、Gemini 22%、Claude 27%）；反直觉的是，执行前（信息更少时）的自评比执行后复盘的判别力更好；用「重新框定为找bug」的对抗式提问能获得最好的校准效果。这对基线第8条「GPS式概率ETA」是一个关键的技术性补充——如果ETA的置信度输入来自agent自我报告，必须先做校准，不能直接采信。",
+  "Dax Raad提出的「speed illusion（速度幻觉）」及其心理机制：AI编码消除了「打补丁式改代码时的负罪感」——过去写一个hack心里会不舒服，往往第三次遇到同样情况就会去重构；现在agent把hack藏起来，这种「不舒服」的信号被压制了，导致技术债不减反增，尽管代码生成速度更快了。他给出三个被AI放大的失败模式：ship不该ship的feature、堆hack而非重新设计、跳过cleanup。同时提出一个基线完全没有涉及的经济学维度——「薪酬/激励结构错配」：工程师天然会把AI带来的效率提升「兑现」为个人下班更早，而非产出更多，除非组织改变考核方式，否则团队测得的整体产出会维持不变，即使个体能力在上升。这与Uber案例对应——AI日活工程师产出PR数量多52%，但CEO直接把这个数量指标等同于生产力提升，暴露了「换指标不换判断」的Goodhart风险。",
+  "一篇学术论文(arXiv:2601.00753)对33,707个agent生成的PR做实证分析，发现审查工作量呈「双regime」分布：agent在「狭窄自动化任务」上表现极好可直接合并(28.3%即时合并)，但在需要迭代打磨的任务上频繁陷入反复反馈循环甚至变成被放弃的「幽灵PR」——这不是一个连续的复杂度谱系，而是「能一次成/需反复磨」的二元分类问题。更实用的是：仅用PR创建时刻的静态复杂度信号（patch size、触及文件数、文件类型）就能以AUC 0.9571的精度预测审查工作量，效果远好于PR描述文本这类语义特征；在20%审查预算约束下能捕获69%的高工作量PR。这给基线第4条「预计闭环轮数」提供了一个可自动计算的量化代理指标，而不必依赖人工猜测。"
+ ],
+ "counter_points": [
+  "Geoff McQueen的立场比基线更激进：他不主张用新指标替换story points，而是主张彻底废除grooming会议和velocity追踪本身，缩小团队规模，靠「没什么可隐藏」的真问责制取代任何形式的数字估算，把story points本身称为「magic beans」——「a made-up measure」用来「minimize accountability while maximizing pay」。这与基线第3条「每个任务给4个数」的精细化改良路线正面冲突：一派认为要设计更好的估算框架，一派认为估算这件事本身在AI时代就该被砍掉。不过该文缺乏可验证的实证数据（「5倍开发者团队」的对比完全没有量化基准），更接近立场宣言而非实证研究。",
+  "The Novelty Bottleneck论文的「O(E)骤然跳变到O(1)、中间无平滑过渡区间」这一发现，对基线第8条「P50/P80/P95连续概率预测+持续修订ETA」构成一定张力：如果人类投入的scaling行为本质是二元/离散的相变而非连续曲线，那么试图对所有任务套用同一套连续概率分布来做ETA可能是建模错误——更合适的做法或许是先判断任务落在「新颖度高」还是「新颖度低」的哪个regime，再分别套用不同的估算逻辑，而不是无差别用同一条概率曲线覆盖。",
+  "多个2026行业数据点提示了基线里没有覆盖的组织性失败模式：审查瓶颈被顶到极限后，团队的真实反应往往不是「把工期拉长」而是「降低审查门槛让代码照样合并」——Faros AI数据显示PR队列压力增大时，零审查合并的PR占比多出31%。这意味着现实中「可自动验证比例×人的review带宽」这个上限（基线第6条）并不是硬约束，而是会被人为击穿的软约束，代价从「排期变长」转移成了「风险变高、生产事故变多」（对应Amazon因Gen-AI辅助变更导致13小时服务中断、要求初级工程师AI相关改动需高级工程师签核的真实案例——见Gergely Orosz报道）。这对基线的框架提出一个补充问题：估算体系除了给出工期概率，或许还需要显式建模「团队会不会在压力下抄近路」这个风险变量。"
+ ],
+ "notable_quotes": [
+  "\"Story points measure the flight. The sprint pays for the whole trip.\" — Sahaj Software, 《Story Points Stopped Working the Day AI Started Writing Code》",
+  "\"wall-clock time achieves O(√E) through team parallelism but total human effort remains O(E)\" — Jacky Liang, The Novelty Bottleneck (arXiv:2603.27438)",
+  "\"better agents improve the coefficient on human effort but not the exponent\" — Jacky Liang, The Novelty Bottleneck (arXiv:2603.27438)",
+  "\"some agents that succeed only 22% of the time predict 77% success\" — Jean Kaddour et al., Agentic Uncertainty Reveals Agentic Overconfidence (arXiv:2602.06948)",
+  "\"If you're a software developer who still insists on using story points, I hope you know how to drive a bus because your career is already over - you just don't know it yet.\" — Geoff McQueen, The Death of Story Points",
+  "\"The entry bar needs to stay low. The review bar needs to go up.\" — Builder.io, I Didn't Become a Developer to Review AI Slop",
+  "\"Writing code has never been easier. Writing good software has not gotten any easier.\" — Dax Raad, via Gergely Orosz / The Pragmatic Engineer"
+ ]
+}

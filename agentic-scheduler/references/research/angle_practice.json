@@ -1,0 +1,126 @@
+{
+ "angle": "practice",
+ "confirms": [
+  "[6] CircleCI《2026 Software Engineering Benchmarks》(经developersdigest.tech转引，未直接核实原始报告)：功能分支吞吐量同比+59%，但中位数团队的主干分支吞吐量反而下降——用真实基准数据实证了基线#9的Amdahl限制：产出爆炸不代表交付提速，比基线更具体的地方是给出了'功能分支涨、主干分支跌'这个可观测的领先/滞后指标组合。",
+  "[5][8] 并行agent确实会制造文件级冲突，且冲突可被实测量化：arXiv论文《AI Agent Pull Requests on GitHub》(George Xu et al.)测得'同一agent并发多实例的文本冲突率约19.8%'——这是基线#12'文件触点冲突超线性增长'首次见到的实测锚点(而非推导或猜测)，可作为'来源分级'里'实测'一档的参照数。",
+  "[3] Anthropic自家Growth Marketing团队用两个专职sub-agent分工(一个识别表现不佳的广告、一个在字符限制内生成新变体)——是'按功能边界拆分任务给不同agent'的真实内部案例，弱确认基线#7的分诊思路，比基线更具体的地方是给出了实际部署的职能切法。",
+  "[2] Cognition明确写道'Devin handles clear upfront scoping well, but not mid-task requirement changes'——确认基线#11(需求变化Scope Change要与技术发现Uncertainty分开记账)，且指出问题具体发生在'任务中途'而非规划阶段。",
+  "[9](二手信息，未直接核实Factory.ai原文) Factory.ai官方指导明确'一个文件的bug是多agent并行的糟糕候选，因为协调本身有成本：更多agent=更多待审查产出+更多假设冲突+更多重新发现上下文的token浪费'——确认基线#12'存在最优并行度n*'的直觉，并给出一个可操作判据：任务是否具备真正的结构化并行性(如大规模迁移)，而非局部小改动。"
+ ],
+ "counter_points": [
+  "[6] Faros AI数据(经developersdigest.tech转引，原始报告未直接核实)：重度AI采用团队PR合并量+98%，但review耗时+91%、PR体积+154%、31%的PR'零审查合并'、人均bug数+54%。这跟基线#9'整体只提速~2x'的温和表述有张力——现实中不少团队并未接受2x天花板做冷静止损，而是选择'击穿'它硬撑吞吐量，代价是用质量债(零审查合并、bug暴涨)换来的虚假提速。建议基线#9补一句限定：'~2x'是质量不滑坡前提下的理论上限，实践中存在'牺牲质量击穿天花板'的分支路径。",
+  "[1][2] Cognition客户案例显示，在'迁移'(单文件3-4小时vs人工30-40小时，10倍)、'历史Java版本迁移'(14倍)、'安全漏洞修复'(20倍，人工30分钟vs Devin 1.5分钟)这类高度同质化、可playbook化的任务上，加速倍数远超基线#9所说的'整体~2x'。这不是反驳Amdahl本身(Amdahl讲的是异构端到端项目全流程平均)，而是提示基线#9的'~2x'结论只对异构项目成立；对可标准化、验证成本能被'人写playbook+code owner抽查'稀释掉的同质化批量任务，应用基线前要先判断任务是否'同质化+可playbook化'，否则会低估可实现的加速倍数。",
+  "[4] Anthropic实测数据显示：专家用户不是发更多prompt，而是每条prompt装载更多判断，让agent的自主执行链条更长(专家每prompt约12个动作/3200字输出 vs 新手约5个动作/600字输出，p<0.001)。这跟基线补充观点'真正不可压缩的分母是人类决策延迟'的表述有微妙张力：决策延迟本身或许不可压缩，但决策发生的'颗粒度/频次'是可压缩的——通过前置专业判断把多次小决策压缩成更少但更重的决策点，减少的是'拍板次数'而非'拍板耗时'，这与基线补充观点里'应减少和批处理拍板次数'其实是一致的，但为其提供了实测数据支撑，而非仅停留在推理层面。"
+ ],
+ "notable_quotes": [
+  "\"we merged 659 Devin PRs into our own codebase, up from 154 in our best week in 2025.\" —— Cognition, How Cognition Uses Devin to Build Devin",
+  "\"the bottleneck shifted from writing code to reviewing it.\" —— Cognition, How Cognition Uses Devin to Build Devin",
+  "\"In practice, there is a clear division of labor in agentic coding––people decide what to build, and the agent decides how to build it.\" —— Anthropic, How Claude Code is used in practice",
+  "\"On average, people make about 70% of the planning decisions but only 20% of the execution decisions.\" —— Anthropic, How Claude Code is used in practice",
+  "\"Parallel generation, sequential merging. This is the core principle that prevents compounding conflicts.\" —— Autonoma, 5 Ways to Stop AI Agents Stepping on Each Other",
+  "\"AI-generated PRs wait 4.6× longer before a reviewer picks them up ... review completes 2× faster — but that initial queue dominance means cycle time barely improves.\" —— Codex Knowledge Base, The Human Review Bottleneck",
+  "\"Gating only the riskiest 20% of PRs captures 69% of total review effort.\" —— Codex Knowledge Base, The Human Review Bottleneck",
+  "\"Devin handles clear upfront scoping well, but not mid-task requirement changes.\" —— Cognition, Devin's 2025 Performance Review",
+  "\"67% of its PRs are now merged vs 34% last year.\" —— Cognition, Devin's 2025 Performance Review",
+  "\"...a one-file bug is a terrible candidate for this since coordination has a cost: more agents create more outputs to review, more chances for conflicting assumptions, and more opportunities to waste tokens rediscovering context.\" —— Factory.ai实践方法论(经Sid Bharath《Factory AI Guide》转述)"
+ ],
+ "novel_ideas": [
+  "[7][6] Review队列瓶颈的精确定位：AI生成PR的'排队等待时间'远大于'审查执行时间'本身——AI-generated PR平均要等4.6倍长的时间才被reviewer捡起，而审查执行本身反而快2倍。结论是：优化'审查速度'对整体cycle time几乎无效，真正要压的是'入队速率'或'并发reviewer数'。这是对基线#9(Amdahl)在review这一具体环节上的精确量化拆解——基线只说'瓶颈上移到review'，这里进一步指出瓶颈其实是'排队'而不是'审查慢'，两者对策完全不同。",
+  "[7] 风险分级审查深度 + 帕累托量化：把PR按P0-P3风险分级映射审查深度(P0-P1逐行全审+威胁建模，P2略读diff+验证测试，P3'CI通过即自动批准')，实测'只对最高风险的20%PR做全面审查，就能覆盖69%的总审查工作量'。这是把基线#7的Blocking/Important/Optional分诊思路，具体落地到'审查深度分配'并给出可操作的帕累托比例，基线没有这个数字。",
+  "[7] '团队AI生成代码占比的最优区间是25%-40%'——超过这个比例，review负担反超生产力收益。首次看到有人给基线#6提到但未量化的'并行度上限'一个可操作硬数字(但该数字来自聚合博客，未见原始一手研究，置信度中等，建议标注为'推导/经验值'而非'实测')。",
+  "[5] '并行生成、串行合并'(Parallel generation, sequential merging)机制：不是限制并行agent数量n，而是把'生成'与'合并'两阶段解耦——生成阶段保持高并行度，合并阶段强制单线程排队，每次合并后跑行为验证再放行下一个。这把基线#12'文件触点冲突超线性增长→存在最优n*'的问题，转化为'不必限制生成端的n，只需要限制merge端的并发度'，是基线没有的解法维度。",
+  "[5] '重叠区域注册表'(overlap zone registry)：显式列出高风险共享文件(认证、数据迁移、配置)，无论PR风险分级结果如何都强制触发人工review。这是文件级冲突治理的具体治理工件——基线只描述了'文件触点冲突'现象，没给出这种'白名单外强制人审'的登记制解法。",
+  "[5] 行为验证(E2E)作为多agent并行的安全网，并给出ROI换算：每次merge花5-10分钟做行为验证 × 10个PR = 50-100分钟，换掉的是部署后4-8小时的debug时间。这给基线#3的Validation成本提供了一个'预防性验证 vs 事后debug'的具体换算逻辑，基线只讲了要记录Validation这一项，没有给出这种成本置换的量化框架。",
+  "[1][2] Cognition内部真实速度指标：一周内合并659个Devin生成的PR(2025年最好一周是154个)，PR合并率从34%→67%(一年内)。这直接回答了'不用人日、用什么衡量进度'——他们实际用'PR merge率'+'PR吞吐量'作为组织级KPI，这是一个已经在大厂内部跑了一年多、可验证的替代指标，而不是理论建议。",
+  "[1][2] Fleet模式下的三层验证结构：人类先写'测试剧本'(playbook，一次覆盖几百个repo)→Devin fleet大规模并行执行(案例中涉及40万+仓库/几十万文件的迁移)→code owner抽查而非全检。这是基线Human Time/Agent Work/Validation框架在'超大规模同质化任务'上的真实实例，揭示了一个基线没提到的关键机制：当任务高度同质化且有playbook时，Validation成本可以靠'抽查'稀释掉，这正是这类任务能做到10-20倍加速(突破基线#9的~2x天花板)的原因。",
+  "[4] Anthropic实测：专家用户每条prompt平均触发约12个agent动作、产出约3200字，新手只有约5个动作、600字(统计显著p<0.001)；典型session约4轮收敛到完成。这是对基线#4'闭环轮数'和补充观点'会拆任务的人5-10x'机理的首次实测支撑——尤其揭示'专家不是发更多指令，而是每条指令装载更多前置判断，从而让agent的自主执行链条更长'，基线此前只有机理推测，这里有真实p值数据。",
+  "[9](二手信息，未直接核实原文) Factory.ai的worker/validator模型分层：批量执行任务用便宜模型(如Sonnet)当'worker'，只在校验判断环节切到贵模型(如Opus)当'validator'(命令行形如`droid exec --mission --worker-model claude-sonnet-4-5 --validator-model claude-opus-4-5`)。这是把'Validation成本'部分转移给更强AI模型而非只靠人力review的新维度——基线的Human Time/Agent Work/Validation三分法里没设想过'用更贵的AI模型做验证层'这种人机混合方案。",
+  "[10](二手信息，未直接核实原文) Cursor实践中的双重分诊规则：一是'一个agent对应一个scope boundary'(不让单个agent同时碰前端和后端，除非任务明确跨界)；二是'后台agent只派给低风险任务(测试生成/文档更新/lint修复/依赖审计)，高判断力任务留给前台交互式agent，保持人的注意力在这上面'。这给基线#7的Blocking/Important/Optional分诊增加了一个正交维度——不按优先级而按'是否需要同步人类判断'来决定agent是前台交互式还是后台异步式。"
+ ],
+ "sources": [
+  {
+   "author": "Cognition",
+   "date": "2026 (undated, recent)",
+   "kind": "blog",
+   "title": "How Cognition Uses Devin to Build Devin",
+   "url": "https://cognition.com/blog/how-cognition-uses-devin-to-build-devin"
+  },
+  {
+   "author": "Cognition",
+   "date": "~2026-01 (18 months post April-2024 launch)",
+   "kind": "blog",
+   "title": "Devin's 2025 Performance Review: Learnings From 18 Months of Agents At Work",
+   "url": "https://cognition.com/blog/devin-annual-performance-review-2025"
+  },
+  {
+   "author": "Anthropic / Claude",
+   "date": "2025-07-24",
+   "kind": "blog",
+   "title": "How Anthropic teams use Claude Code",
+   "url": "https://claude.com/blog/how-anthropic-teams-use-claude-code"
+  },
+  {
+   "author": "Anthropic",
+   "date": "2026 (data span Oct 2025 - Apr 2026)",
+   "kind": "report",
+   "title": "How Claude Code is used in practice",
+   "url": "https://www.anthropic.com/research/claude-code-expertise"
+  },
+  {
+   "author": "Autonoma",
+   "date": "2026",
+   "kind": "blog",
+   "title": "5 Ways to Stop AI Agents Stepping on Each Other",
+   "url": "https://getautonoma.com/blog/parallel-ai-agent-prs"
+  },
+  {
+   "author": "Developers Digest",
+   "date": "2026",
+   "kind": "blog",
+   "title": "AI Coding Agents Move the Bottleneck to Review Queues",
+   "url": "https://www.developersdigest.tech/blog/ai-coding-agents-review-queues"
+  },
+  {
+   "author": "Daniel Vaughan / Codex Knowledge Base",
+   "date": "2026-05-24",
+   "kind": "blog",
+   "title": "The Human Review Bottleneck: Practical Code Review Strategies for Agent Output",
+   "url": "https://codex.danielvaughan.com/2026/05/24/human-review-bottleneck-code-review-strategies-agent-output/"
+  },
+  {
+   "author": "George Xu, Arjun Subramanian, Nithilan Karthik",
+   "date": "2026",
+   "kind": "paper",
+   "title": "AI Agent Pull Requests on GitHub: Frequency, Structure, and Merge Conflict Rates",
+   "url": "https://arxiv.org/pdf/2607.04697"
+  },
+  {
+   "author": "Sid Bharath (二手，未直接WebFetch核实全文，经WebSearch摘要获取)",
+   "date": "2026",
+   "kind": "blog",
+   "title": "Factory AI Guide: Droid, Missions, Skills, and Custom Agents",
+   "url": "https://sidbharath.com/blog/factory-ai-guide/"
+  },
+  {
+   "author": "thegdsks (dev.to，二手，未直接WebFetch核实全文)",
+   "date": "2026",
+   "kind": "blog",
+   "title": "Cursor 3 ships parallel AI agents. Here is the multi-agent workflow that actually works.",
+   "url": "https://dev.to/thegdsks/cursor-3-ships-parallel-ai-agents-here-is-the-multi-agent-workflow-that-actually-works-2bk8"
+  },
+  {
+   "author": "Termdock（二手，未直接WebFetch核实全文）",
+   "date": "2026",
+   "kind": "blog",
+   "title": "Git Worktree Conflicts with Multiple AI Agents: Diagnosis and Fixes",
+   "url": "https://www.termdock.com/en/blog/git-worktree-conflicts-ai-agents"
+  },
+  {
+   "author": "MindStudio",
+   "date": "2026",
+   "kind": "blog",
+   "title": "Issue Trackers as AI Agent Infrastructure: Why Jira and Linear Are Winning",
+   "url": "https://www.mindstudio.ai/blog/issue-trackers-ai-agent-infrastructure-jira-linear"
+  }
+ ]
+}

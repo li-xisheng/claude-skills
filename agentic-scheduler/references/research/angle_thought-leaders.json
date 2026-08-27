@@ -1,0 +1,155 @@
+{
+ "angle": "thought-leaders",
+ "sources": [
+  {
+   "title": "Harness engineering for coding agent users",
+   "url": "https://martinfowler.com/articles/harness-engineering.html",
+   "author": "Birgitta Böckeler & Martin Fowler",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "The role of developer skills in agentic coding (Exploring Gen AI memo series)",
+   "url": "https://martinfowler.com/articles/exploring-gen-ai/13-role-of-developer-skills.html",
+   "author": "Birgitta Böckeler",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "Experiences with local models for coding",
+   "url": "https://martinfowler.com/articles/exploring-gen-ai/local-models-for-coding-experiences.html",
+   "author": "Birgitta Böckeler",
+   "date": "2026-07",
+   "kind": "blog"
+  },
+  {
+   "title": "Genie Lessons: Nobody Wants Agents",
+   "url": "https://newsletter.kentbeck.com/p/genie-lessons-nobody-wants-agents",
+   "author": "Kent Beck",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "Augmented Coding: Coached by the Genie",
+   "url": "https://newsletter.kentbeck.com/p/augmented-coding-coached-by-the-genie",
+   "author": "Kent Beck",
+   "date": "2025-2026",
+   "kind": "blog"
+  },
+  {
+   "title": "TDD, AI agents and coding with Kent Beck",
+   "url": "https://newsletter.pragmaticengineer.com/p/tdd-ai-agents-and-coding-with-kent",
+   "author": "Gergely Orosz (interviewing Kent Beck)",
+   "date": "2025-2026",
+   "kind": "blog"
+  },
+  {
+   "title": "The Real AI Advantage",
+   "url": "https://blog.holub.com/p/the-real-ai-advantage",
+   "author": "Allen Holub",
+   "date": "2025-2026",
+   "kind": "blog"
+  },
+  {
+   "title": "#NoEstimates, An Introduction.",
+   "url": "https://holub.com/noestimates-an-introduction/",
+   "author": "Allen Holub",
+   "date": "n/a (pre-AI foundational piece)",
+   "kind": "blog"
+  },
+  {
+   "title": "As AI Accelerates Software Complexity, Thoughtworks Technology Radar Urges a Return to Engineering Fundamentals (Radar Vol.34)",
+   "url": "https://www.thoughtworks.com/about-us/news/2026/combat-ai-cognitive-debt-radar-v34",
+   "author": "Thoughtworks",
+   "date": "2026-04",
+   "kind": "report"
+  },
+  {
+   "title": "Stop being skeptical about AI for development with Charity Majors",
+   "url": "https://newsletter.pragmaticengineer.com/p/stop-being-skeptical-about-ai-for",
+   "author": "Gergely Orosz (interviewing Charity Majors)",
+   "date": "2025-2026",
+   "kind": "blog"
+  },
+  {
+   "title": "Predictability is the Point",
+   "url": "https://eurekamind.substack.com/p/predictability-is-the-point",
+   "author": "Inbar Rose",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "Orchestrate to Survive the Speed",
+   "url": "https://engineeredintelligence.substack.com/p/orchestrate-to-survive-the-speed",
+   "author": "作者未明确标注（substack: engineeredintelligence）",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "Gas Town's Agent Patterns, Design Bottlenecks, and Vibecoding at Scale",
+   "url": "https://maggieappleton.com/gastown",
+   "author": "Maggie Appleton（论述 Steve Yegge 的 Gas Town）",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "GasTown and the Two Kinds of Multi-Agent",
+   "url": "https://paddo.dev/blog/gastown-two-kinds-of-multi-agent/",
+   "author": "paddo.dev（论述 Steve Yegge 的 Gas Town）",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "AI Coding Agent Productivity Debates: The 2026 Paradox (引用 METR trial 数据)",
+   "url": "https://blog.exceeds.ai/ai-coding-agents-productivity-paradox/",
+   "author": "exceeds.ai blog",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "From Autocomplete to Agents: AI Coding State of Play (QCon London 2026 keynote coverage)",
+   "url": "https://infoq.com/news/2026/03/ai-coding-state",
+   "author": "InfoQ（记录 Birgitta Böckeler 演讲）",
+   "date": "2026-03",
+   "kind": "report"
+  }
+ ],
+ "confirms": [
+  "[Böckeler/Fowler, harness-engineering.html] 验证成本瓶颈得到确认，且比基线更具体：把验证机制拆成 Guides(前馈)/Sensors(反馈) × Computational(确定性/快)/Inferential(概率性/慢) 四象限，明确指出计算型验证'run in milliseconds to seconds, results are reliable'，可以每次commit都跑；推理型验证更贵更不确定，因此不能。这细化了基线#5/#6笼统的'验证成本'概念。",
+  "[Böckeler, 13-role-of-developer-skills.html] 'The longer a coding session gets, the more hit-and-miss it becomes.' 印证基线#4提出的'预计闭环轮数'作为估算单位比时长更合理——因为单session质量本身随长度非线性衰减，闭环轮数隐含了这种衰减。",
+  "[Thoughtworks Radar v34] 'deterministic quality gates like compilers, linters, type checkers and test suites integrated directly into agent workflows so failures trigger auto-correction before human review' —— 确认基线#6'可自动验证比例'是决定并行上限的关键杠杆，且已成为行业公认的标准实践（Radar记录的是规模化实践而非理论推导）。",
+  "[Orchestrate to Survive the Speed] 'Four agents finished work. Each waiting on me.' / 'The diffs come faster than I can read them.' —— 一线实践者的具体现场描述，确认基线#6提出的'瓶颈从coding上移到review'不是理论推测而是已经在发生的真实现象，来源等级=实测。",
+  "[转引 Steve Yegge / Gas Town] 'Gas Town churns through implementation plans so quickly that you have to do a LOT of design and planning to keep the engine fed.' 在20-30个并行agent的极端场景下确认基线#12'把判断前置到规划阶段'的机理，并给出了具体的规模量级。",
+  "[Kent Beck] 多agent协调本身消耗认知带宽（需要持续监控'哪个agent在干什么、何时该打断'），确认基线#6'并行agent数量存在真实上限'不仅因为review带宽，也因为协调状态维护的认知负担——这是基线论点里隐含但未点明的一层。"
+ ],
+ "novel_ideas": [
+  "[Kent Beck, 'Genie Lessons'] 'Multi-agent is a feature. Outcome-orientation is the thing the feature is supposed to deliver. We keep getting those confused.' —— 提出一个基线没有的反模式警示：不要为了'能跑多少个并行agent'本身去优化，应始终锚定在'多快/多难/多贵'这三个结果性问题上；多agent架构本身可能制造出新的'管理开销'而非消除瓶颈。",
+  "[Kent Beck, 同文] 'Right now, five agents can work on this codebase simultaneously. Five people can't. That's backwards.' —— 提出一个基线完全没有的诊断角度：如果协作基础设施（git分支/PR流程）对agent比对人更友好，说明问题的真正解法方向也许不是'编排更多agent'，而是'重新设计支持人类实时协作的基础设施本身'——把'人类瓶颈'问题的解法从压缩个体决策延迟，转向重造协作基建。",
+  "[Inbar Rose, 'Predictability is the Point'] 'Autonomy is a vanity metric... Highly autonomous systems are not necessarily mature. They are often just under-constrained.' 以及 'A system that does less, more predictably, is a better system.' —— 提出与基线#8完全不同的应对不确定性的路径：不是把精力花在'更准地预测不确定性'（P50/P80/P95动态ETA），而是花在'用约束把不确定性从系统设计里消灭掉'。给出三个可审计的'结构成熟度'指标：提示词是否收窄、接口是否更严格、失败模式是否'无聊'——把成熟度定义从'自主程度'反转为'约束程度'，这是基线完全没有的一个维度。",
+  "[Böckeler/Fowler harness-engineering.html] Guides×Sensors 与 Computational×Inferential 交叉出的2x2验证机制矩阵，并给出具体判断依据（编码约定用推理型前馈如AGENTS.md；结构测试用计算型反馈如ArchUnit hooks）——可以直接喂给基线#3'四个数'里的Validation维度，把它从一个笼统数字变成一棵'该用哪种验证机制'的决策树，这是基线目前缺失的操作化工具。",
+  "[Thoughtworks Radar v34] 'The Ralph Loop' 模式——不用多agent swarm，而是单agent在无限循环中每轮换一个全新的上下文窗口以避免质量随上下文积累而衰减，一次只做spec里的一小块直到收敛。这是应对'闭环轮数不可控/单session质量衰减'问题的具体架构解法，基线完全没有涉及'新鲜上下文窗口'这个技术手段。",
+  "[Steve Yegge Gas Town生态，经 maggieappleton.com / paddo.dev 转述] '八阶段成熟度模型'（Stage 1 近零AI 到 Stage 8 自建编排器），并明确警告低阶段开发者被强推到高阶段工具（如管理20-30个并行agent）会'痛苦而非高效'。这提出一个基线完全没有的维度：估算/排期方法论本身应该按团队/个人所处的agentic coding成熟阶段分层适配，而不存在一套放之四海而皆准的'闭环轮数'或'关键路径'框架。",
+  "[Kent Beck，经 Pragmatic Engineer 采访转述] 技能贬值/增值的具体清单：贬值的是语法层技能（'知道Rust里&和*该放哪'），增值的是'设定愿景、定义里程碑、维持系统复杂度可控'这类组织性技能，称为'hugely leveraged skills'。基线完全未涉及人才/技能维度，这条为基线'方法论从编码工时转向关键路径与判断'的转型提供了对应的'个人能力该往哪迁移'的答案。",
+  "[Charity Majors，经 Pragmatic Engineer 采访转述] 把代码重新定义为'理解的物化视图（materialized view of understanding）'——AI时代代码本身廉价可弃，团队真正的产品从来不是代码行而是'共享理解+生产行为'。这为基线#6'瓶颈从coding上移到review'提供了一层基线没有的哲学解释：评审的本质不是核对代码对不对，而是核对'团队理解是否被正确物化'。",
+  "[Gas Town生态，转引] 'Refinery'角色——专门处理并行git合并冲突的自动化/人工角色，把'合并队列(merge queue)'本身当作需要专职资源管理的关键路径节点。这给基线#12'文件触点冲突使Integration成本随并行度n超线性增长'提供了一个具体的组织化解法：设专门的合并/精炼角色，而不仅仅是承认成本存在。"
+ ],
+ "counter_points": [
+  "[METR trial，经 blog.exceeds.ai 转引] 'developers can be 19% slower while believing they were 20% faster' —— 直接冲击基线#5/#9的前提假设。基线假设'AI大幅压缩Implementation Cost'是既成事实，Amdahl定律的论证（编码提速10倍→整体提速~2倍）建立在'编码确实变快'之上；但METR的对照实验显示，至少在部分真实场景下，开发者对'变快'的主观感受本身就是错觉。如果分子（编码提速倍数）本身不可靠，基线里所有基于它做的换算都需要标注更强的不确定性，而不能被当作已验证的输入直接使用。",
+  "[Allen Holub, #NoEstimates原始论证] 经典#NoEstimates反对估算的理由是'用户故事描述的是用户的工作而非解决方案，根本没有可估算的对象'——这个论证早于AI就已成立，且逻辑上独立于'编码变便宜'。这说明基线里'AI时代把估算对象从编码工时转向关键路径/验证成本'的框架，其实是在回答一个NoEstimates运动从未处理过的新问题（判断/验证的不可压缩性），而不是NoEstimates论证的延伸或加强版——两者问题设定本质不同（NoEstimates否定的是'预测的认识论可能性'本身；基线否定的是'编码工时作为计量单位的有效性'），不宜简单援引NoEstimates的权威性来加固基线的论证。",
+  "[Inbar Rose, 'Predictability is the Point'] 隐含反驳基线#8默认的'概率化ETA(P50/P80/P95)+持续修订'路径：该文主张成熟度提升的正确方向不是把不确定性预测得更准，而是从系统设计层面把不确定性来源约束掉。这与基线'像GPS导航一样持续修订ETA'（默认接受不确定性、动态追踪它）在方法论选择上是两条互斥的路线，基线目前只呈现了前者，未讨论'主动收窄自主范围以消灭不确定性'这条替代路径。"
+ ],
+ "notable_quotes": [
+  "\"I was managing it. Watching which agent was doing what. Wondering when to interrupt. Holding state in my head that the system should have been holding for me.\" — Kent Beck, 'Genie Lessons: Nobody Wants Agents'",
+  "\"Multi-agent is a feature. Outcome-orientation is the thing the feature is supposed to deliver. We keep getting those confused.\" — Kent Beck, 同上",
+  "\"Right now, five agents can work on this codebase simultaneously. Five people can't. That's backwards.\" — Kent Beck, 同上",
+  "\"[The valuable skills now are] having a vision, being able to set milestones towards that vision, keeping track of a design to maintain the levels or control the levels of complexity as you go forward\" — Kent Beck, via Pragmatic Engineer 采访",
+  "\"A good harness should not necessarily aim to fully eliminate human input, but to direct it to where our input is most important.\" — Birgitta Böckeler & Martin Fowler, 'Harness engineering for coding agent users'",
+  "\"The longer a coding session gets, the more hit-and-miss it becomes.\" — Birgitta Böckeler, 'The role of developer skills in agentic coding'",
+  "\"Autonomy is a vanity metric... Highly autonomous systems are not necessarily mature. They are often just under-constrained.\" — Inbar Rose, 'Predictability is the Point'",
+  "\"A system that does less, more predictably, is a better system.\" — Inbar Rose, 同上",
+  "\"You orchestrate not to go faster. You orchestrate to survive the speed.\" — 'Orchestrate to Survive the Speed', engineeredintelligence.substack.com",
+  "\"The point of creating products in small iterations is to get the continuous feedback necessary to produce a great product.\" — Allen Holub, 'The Real AI Advantage'",
+  "\"Developers can be 19% slower while believing they were 20% faster.\" — METR trial finding, 转引自 'AI Coding Agent Productivity Debates: The 2026 Paradox'",
+  "\"Gas Town churns through implementation plans so quickly that you have to do a LOT of design and planning to keep the engine fed.\" — Steve Yegge, 转引自 maggieappleton.com/gastown"
+ ]
+}
