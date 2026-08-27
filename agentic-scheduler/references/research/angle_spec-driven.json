@@ -1,0 +1,118 @@
+{
+ "angle": "spec-driven",
+ "sources": [
+  {
+   "title": "Taming AI coding agents with specifications",
+   "url": "https://tessl.io/blog/taming-agents-with-specifications-what-the-experts-say/",
+   "author": "Tessl (访谈 Guy Podjarny / Alan Pope / Don Syme 等)",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "Spec-Driven Development (SDD) — best practices (so far)",
+   "url": "https://blog.allegro.tech/2026/06/spec-driven-development-best-practices.html",
+   "author": "Allegro Tech",
+   "date": "2026-06",
+   "kind": "blog"
+  },
+  {
+   "title": "ADRs for Coding Agents: Architectural Context, Optimized",
+   "url": "https://www.actual.ai/blog/agent-optimized-adrs",
+   "author": "Actual AI",
+   "date": "2025/2026",
+   "kind": "blog"
+  },
+  {
+   "title": "Instruction Adherence in Coding Agent Configuration Files: A Factorial Study of Four File-Structure Variables",
+   "url": "https://arxiv.org/abs/2605.10039",
+   "author": "Damon McMillan",
+   "date": "2026-05",
+   "kind": "paper"
+  },
+  {
+   "title": "The Spec Growth Engine: Spec-Anchored, Code-Coupled, Drift-Enforced Architecture for AI-Assisted Software Development",
+   "url": "https://arxiv.org/abs/2606.27045",
+   "author": "(arXiv, 内部设计文档，公开发布计划中)",
+   "date": "2026-06",
+   "kind": "paper"
+  },
+  {
+   "title": "Professional Software Developers Don't Vibe, They Control: AI Agent Use for Coding in 2025",
+   "url": "https://arxiv.org/abs/2512.14012",
+   "author": "arXiv",
+   "date": "2025-12",
+   "kind": "paper"
+  },
+  {
+   "title": "Putting Spec Kit Through Its Paces: Radical Idea or Reinvented Waterfall?",
+   "url": "https://blog.scottlogic.com/2025/11/26/putting-spec-kit-through-its-paces-radical-idea-or-reinvented-waterfall.html",
+   "author": "Colin Eberhardt, ScottLogic",
+   "date": "2025-11-26",
+   "kind": "blog"
+  },
+  {
+   "title": "Spec-driven development with AI: Get started with a new open source toolkit",
+   "url": "https://github.blog/ai-and-ml/generative-ai/spec-driven-development-with-ai-get-started-with-a-new-open-source-toolkit/",
+   "author": "GitHub Blog",
+   "date": "2025-09",
+   "kind": "blog"
+  },
+  {
+   "title": "Recap: Spec-driven development with Kiro (DEV314)",
+   "url": "https://builder.aws.com/content/393ZE7220eIhhxyCeBYythp5Qnm/recap-spec-driven-development-with-kiro-dev314",
+   "author": "AWS Builder Center",
+   "date": "2025/2026",
+   "kind": "blog"
+  },
+  {
+   "title": "Context Rot: Why AI Gets Worse the Longer You Chat (And How to Fix It)",
+   "url": "https://www.producttalk.org/context-rot/",
+   "author": "Product Talk (综述 Chroma / Liu et al. / Veseli et al. 等研究)",
+   "date": "2025/2026",
+   "kind": "blog"
+  },
+  {
+   "title": "Agent Skills: Anthropic's Next Bid to Define AI Standards",
+   "url": "https://thenewstack.io/agent-skills-anthropics-next-bid-to-define-ai-standards/",
+   "author": "The New Stack",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "Spec-Driven Development in 2026: What It Is, the Tooling, and How Teams Actually Use It",
+   "url": "https://dev.to/krlz/spec-driven-development-in-2026-what-it-is-the-tooling-and-how-teams-actually-use-it-2fk2",
+   "author": "DEV Community",
+   "date": "2026",
+   "kind": "blog"
+  }
+ ],
+ "confirms": [
+  "「判断前置」是2025-2026年SDD运动的核心叙事，与基线#12完全一致：当agent负责写代码后，spec成为人类能产出的最高杠杆产物（\"when agents write the code, the spec is the most leveraged thing a human can produce\"），多篇2026年综述文章反复重申这一框架 [DEV Community; devtoollab/thebcms 综述]。",
+  "ADR复兴印证「把判断从执行阶段前置到规划阶段」的具体工作流：为重大架构变更先写ADR并随PR提交，形成\"forcing function\"——决策在代码落地前必须显式化，reviewer评审的是推理过程而非实现细节，这正是基线#12机理的可操作版本 [Actual AI]。",
+  "Kiro的真实客户案例给出基线#3(Human Time是稀缺资源)的量化印证：spec-first编写的40小时功能，人类实际投入时间压缩到8小时以内 [AWS Builder Center]（注：厂商自述数据，未经第三方复核）。",
+  "spec粒度失控（过细/过粗）导致的问题，与基线中「太细=写代码，太粗=agent乱来」的直觉判断一致，且被多个独立信源（Tessl访谈的专家们、Allegro Tech）用几乎相同的语言重复确认：过细则spec和code的边界模糊、spec失去存在意义；过粗则agent自由解释、结果偏离意图 [Tessl; Allegro Tech]。"
+ ],
+ "novel_ideas": [
+  "Spec成熟度三层模型（Guy Podjarny）：spec-assisted（如CLAUDE.md/cursor rules，弱约束）→ spec-driven（改代码前先改spec，中等承诺）→ spec-centric（代码可丢弃、spec containing all that matters的终态）。基线未区分这三级，这给「spec该做到多细」提供了一个分层坐标系而非单一标准 [Tessl]。",
+  "「启发式spec」vs「规范spec」的区分（Guy Podjarny）：前者只是引导性文字，后者必须配有可自动验证的回归测试作为「真相锁定」机制——spec的权威性不来自写得多详细，而来自是否有可执行的验证附着在它身上。这与基线#12「判断前置」形成互补：光把判断写进文档不够，判断必须变成可执行的检查 [Tessl]。",
+  "Agent优化版ADR格式，六条具体改造规则：①用`applies_to`文件通配符做作用域限定（编辑CSS的agent不加载数据库schema的ADR，直接降低无关上下文注入）；②用MUST/MUST NOT等命令式关键词替代需要agent自行总结的散文段落；③每条决策必须附带可执行的grep/lint规则或命令，使agent和CI都能自证合规；④单个上下文文件控制在约200行以内（引用Anthropic的建议）；⑤用`R-IMG-001`式稳定ID做可寻址引用，便于在commit message/comment中精确指向某条规则；⑥提前消解规则间冲突，因为agent面对冲突规则时会「随意选一个」。这是把「ADR」从人类可读的历史记录，重新设计成agent可执行的运行时上下文对象 [Actual AI]。",
+  "Spec Growth Engine（arXiv 2606.27045）提出了一套把「spec作为单一真相来源」从口号变成CI强制机制的具体架构，是本次检索中最接近「把判断前置这件事工程化」的方案，核心四件套：①Spec图按C4分层（system→container→component→code），每个架构节点对应一个SPEC.md；②Contract/Design分离（借用Parnas信息隐藏原则）：同级/依赖节点只能读该节点的contract（对外接口、不变量、错误行为、验收标准），design（内部实现方式）只对该节点自身和其父节点可见——这精确回答了「spec该细到什么颗粒度」：只有contract层需要被跨团队/跨agent共享和锁定，design层允许agent自由发挥；③Drift Gate：从SPEC.md推导出「Intent Graph」，从静态代码分析推导出「Evidence Graph」，二者不一致（孤儿代码、未声明依赖、绕过contract直接读取他方内部实现、依赖目标缺少contract）会被判定为硬错误，直接阻断合并——这是「spec-code不漂移」的可执行强制手段，而不是靠人自觉维护；④Spine Context Assembler：agent的上下文被限定为「从根到当前节点的所有权路径」（root不变量+路径上各节点的contract+当前节点完整spec+一跳依赖的contract+自己的代码），显式排除同级组件、依赖方的design/代码、传递依赖和agent自由grep——用确定性函数取代agent自主检索上下文的方式。此外还提出「hardest-first」的垂直切片增长协议：先打通demonstrate系统真正work的最薄路径且优先做风险最高的集成点，「frontier stub」（假实现）只允许出现在当前切片的路径之外，且必须显式标注它对应哪个后续切片。该论文目前只是内部设计文档，尚无实证评估数据（无迭代轮数对比、无spec-code不一致的量化减少），这点需明确标注为方法论构想而非验证结果 [arXiv 2606.27045]。",
+  "对基线追问「有没有人量化过spec质量对闭环轮数的影响」，找到一个方向相反但同样重要的实证结果：McMillan（arXiv 2605.10039）在1,650次Claude Code CLI会话（16,050个函数级观测点，2个代码库，3个前沿模型）上做因子设计实验，专门操纵CLAUDE.md/AGENTS.md的四个「spec质量」维度——文件大小(25/100/250/500行)、指令在文件中的位置、文件架构(单文件 vs 单文件+AGENTS.md vs 再加嵌套目录级CLAUDE.md)、相邻文件间是否存在矛盾指令——多重检验校正后，这四个变量及其两两交互作用**均未产生可检测的指令遵循率差异**。真正显著的是另一个变量：同一会话内每多生成一个函数，agent遵循指令的概率下降约5.6%(OR=0.944，非单调)，且遵循率的系统性差异主要来自任务类型本身。换句话说，「把spec文件写大/写规范/放对位置」这类结构性动作，在该实验条件下对减少返工/提高一次通过率没有可测量的贡献；真正的杠杆点是会话/任务的长度控制与任务类型选择——这是对「靠加强spec文档格式来减少闭环轮数」这一朴素直觉的一次直接、量化的证伪（虽是单篇研究、需谨慎推广），后续研究者据此提出「最小上下文原则」：仓库指令应当短、常新、无冲突、且绑定可执行反馈，而不是靠篇幅或结构取胜 [arXiv 2605.10039]。",
+  "Context Rot研究给「spec别写太长/太细」提供了架构层面的因果机制，而不只是经验直觉：模型质量在远未触及上下文窗口上限时就已经开始下降（200K窗口的模型在约50K token时已出现明显退化）；当上下文填充超过50%后，衰减模式从「U型曲线（善记开头结尾，弱记中段）」转变为「按距末尾的距离衰减（越early的信息越容易被忽视）」；根因被归结为RoPE长程衰减特性导致远距离token对的注意力权重系统性降低，softmax归一化又放大了这一效应。这解释了Spec Growth Engine为什么要用「Spine Context Assembler」显式裁剪掉无关上下文而不是「塞给agent更全的spec」——过量的、哪怕相关的spec文本本身就会稀释注意力、降低agent对关键约束的执行力 [Product Talk 综述 Chroma / Liu et al. / Veseli et al.]。",
+  "Anthropic的Agent Skills开放标准（2025年12月18日发布，SKILL.md两个必填YAML字段+Markdown正文）本质上是把「spec写作」标准化、模块化、可版本化、可审计化的一次基础设施动作：48小时内Microsoft/OpenAI跟进兼容，2026年3月已有32个厂商工具读同一套SKILL.md目录结构。更关键的是它间接提供了「spec质量→agent表现」的大样本量化数据：SkillsBench对47,150个公开skill评分，平均质量仅6.2/12分，而经过策划/打磨的高质量skill能让agent通过率平均提升16.2个百分点——这是本次检索中最接近「量化spec质量对agent成功率影响」的规模化证据，虽然衡量单位是「通过率」而非「闭环轮数」[The New Stack]。",
+  "「人类审查gate会不会随agent能力提升而消失」这个问题上，业内出现了一个基线没有涉及的框架性分歧：一派认为SOTA agent已经足够胜任spec-kit里的各个步骤，人工gate只是拖慢进度的历史包袱；另一派反驳说人工gate的存在从来不是因为agent能力不够，而是企业软件本身运行在风险管理、合规、法律问责、治理、安全等约束之下——这类gate不会因模型变强而自动消失。这对基线#6「并行agent上限=自动验证比例×人类review带宽」给出了一个补充维度：review带宽的下限不完全是能力约束型瓶颈，其中一部分是制度强制型瓶颈，二者需要分开建模 [DEV Community 综述]。",
+  "spec颗粒度的一个具体工程标记法（Guy Podjarny）：用`.impl`后缀标注spec中「低优先级实现细节」的段落，让agent知道这部分只是建议、可以自由偏离，而未标注部分才是硬约束——这是一种「在同一份文档内部分层锁定优先级」的轻量实现方式，比另起一份「contract文档+design文档」的重量级方案（如Spec Growth Engine）更容易落地到日常项目 [Tessl]。"
+ ],
+ "counter_points": [
+  "SDD并非无成本，且成本可能反噬。Colin Eberhardt（ScottLogic）做了同一功能的AB实测：Spec Kit全流程耗时33.5分钟agent执行+3.5小时人工审查、产出689行代码但配套2,577行markdown；同一功能用传统迭代式prompt仅8分钟agent执行+24分钟总耗时、零markdown产出，且两种方式最终代码都存在bug（质量未见提升）。作者原话「传统方式快了差不多十倍」。这直接复杂化基线关于「spec-driven=更高效」的隐含预期：对于范围明确、风险不高的任务，重spec流程的Validation和文档维护成本可能超过它节省的返工成本，与基线#3(四数分离)的逻辑一致——spec前置的收益要看具体任务的Critical Path和探索程度，不是普遍成立的乘数 [ScottLogic]。",
+  "ThoughtWorks Technology Radar（Vol 33, 2025）把SDD正式归入「Assess」而非「Adopt」环，并明确警告其存在「偏向重度前期规范化和大爆炸式发布(big-bang releases)」的反模式倾向——这是行业内部对「SDD=瀑布模型换皮」质疑的机构级背书，说明SDD在2026年虽然工具生态火热，但在方法论成熟度评估上仍处于观察阶段，不宜直接当作已验证的最佳实践采纳 [DEV Community 综述引用]。",
+  "McMillan（arXiv 2605.10039）的空结果本身就是对「写更好格式的spec文档能减少返工/闭环轮数」这条直觉的一次证伪：被专门设计来测试的四个「spec质量」结构变量（文件大小、位置、架构、冲突）在统计上都不显著，真正显著的是任务类型和单次会话内的token/生成量积累导致的漂移。这提醒我们基线#12「判断前置」的机制可能更多来自「减少了agent需要自主判断的决策点数量」，而不是「spec文档写得更规范」本身——用于指导实践时，重点该放在缩短单次会话/单个任务的范围（对应基线#7的主线vs发现池分诊），而非投入精力打磨spec文档的排版结构 [arXiv 2605.10039]。",
+  "Kiro官方及第三方使用报告都承认一个未解决的缺口：spec在实践中仍是「相对静态的文档」，工具本身不能完全自动保证spec和代码不脱节。这说明目前商用主流SDD工具（Kiro、Spec Kit）尚未实现Spec Growth Engine论文构想的「drift gate强制同步」机制——「spec是单一真相来源」目前更多是流程纪律层面的承诺，而非有工程强制力的保证，一旦团队纪律松懈，spec会重演传统设计文档「写完即过时」的老问题 [AWS相关报道; Spec Growth Engine论文对比]。"
+ ],
+ "notable_quotes": [
+  "\"The classic ADR was written for a person who reads a few of them, occasionally, and fills the gaps with judgment. An agent reads all of them, every session, under a token budget, and acts on them literally. Same decisions, very different reader. That changes the format.\" —— Actual AI blog, 《ADRs for Coding Agents》",
+  "\"My experience of AI is that it makes you even more agile, iterations are faster. Spec Kit drags you right back into the past!\" —— Colin Eberhardt, ScottLogic blog",
+  "\"Fakes are permitted only at the frontier (a later slice's dependency), never on the current slice's active path.\" —— 《The Spec Growth Engine》, arXiv 2606.27045（关于frontier stub约束的原文表述）",
+  "\"in 2026, SDD is best understood not as a tool but as a discipline: when agents write the code, the spec is the most leveraged thing a human can produce.\" —— DEV Community, 《Spec-Driven Development in 2026》综述总结"
+ ]
+}

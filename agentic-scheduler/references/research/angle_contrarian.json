@@ -1,0 +1,92 @@
+{
+ "angle": "contrarian",
+ "confirms": [
+  "基线#6（并行 Agent 数上限=可自动验证比例×人的 review 带宽）得到强实证支持，且给出了真实弹性系数：LinearB 对 810 万条 PR、4800+组织的分析显示 AI 团队 PR 评审时间暴涨约 91%~441.5%，平均 PR 体积扩大 154%~250%；Denisov-Blanch 等人的企业纵向研究（802 名开发者、196,212 条 PR，arXiv:2607.01904）显示人均吞吐翻倍到 2.09x 时，人均审查负担也大致同步翻倍。同时 GitHub 官方数据显示，目前 AI 辅助审查工具只能替代掉 30%~50% 的人工审查时间——说明基线公式里『可自动验证比例』这个乘数，经验上限大约只有 0.3~0.5，比理想假设低得多。",
+  "基线#9（编码提速10倍，整体只提速~2倍，Amdahl定律）方向成立，但『~2x』这个具体锚点可能偏乐观：CircleCI 对 2200 万+次 CI 运行的分析显示，功能分支吞吐量同比+15%的同时，主干分支吞吐量反而-7%，主干构建成功率跌到70.8%；Google DORA 2024-2025 报告则直接指出部署频率、变更前置时间、变更失败率、MTTR 这些组织级指标『没有随 AI 工具使用增加而改善』。也就是说，折算进 review/集成/生产稳定性之后，组织级净收益的真实分布区间可能是 0x~2x，而不是稳定收敛在 2x。",
+  "基线#5（AI 压缩 Implementation Cost 但不压缩 Uncertainty Cost）得到 Fred Brooks《No Silver Bullet》(1986) essence/accident 框架的强力理论支撑，并被 2026 年的重述文章用 METR 数据验证：经验开发者在自己熟悉的成熟代码库上工作时任务几乎全是『essence』（设计判断、隐性知识），AI 能压缩的『accident』占比很小，于是实测到的是 -19% 而非正收益。这给 Uncertainty Cost 提供了一条可操作诊断链：AI 提速上限 ≈ 任务中 accident 的占比。",
+  "基线#12『文件触点冲突使 Integration 成本随并行度 n 超线性增长』得到部分但不完全一致的证据：Denisov-Blanch 研究显示 PR 吞吐 translate 成 review 负担大致是线性关系（~2x 吞吐→~2x 负担），并非明显超线性；但 CircleCI 的主干失败率数据（主干成功率仅70.8%）显示集成/合并层面确有超线性恶化迹象。提示应把『review 负担』（近似线性）和『集成/合并冲突成本』（可能超线性）拆成两条不同曲线，而不是合并成一个笼统的『最优并行度 n*』模型。"
+ ],
+ "novel_ideas": [
+  "Essential/Accidental Complexity 诊断公式（Brooks 1986 + cekrem 2026 重述）：给任务估算前先问『这个任务里 accident（语法/样板/工具配置）占比多少、essence（设计决策/隐性知识/跨系统理解）占比多少』；AI 的实际提速上限 ≈ accident 占比。这是一个可以直接嫁接在基线『预计闭环轮数』估算法之前的前置诊断步骤，基线目前完全没有。",
+  "『自评速度-实测速度』系统性偏差本身就是一种不可忽视的风险：METR RCT 显示，即便是 16 名经过屏幕录像+第三方计时的资深开发者，事前预测 AI 提速24%，事后自评提速20%，实测结果却是慢19%（约39~45个百分点的感知-实测落差）。这意味着基线#12『估算数字须标注来源等级（实测/历史校准/推导/猜）』里，连『实测』（尤其是人自报耗时）也可能系统性失真——除非像 METR 那样做 blind RCT，否则历史校准数据本身需要打折使用。",
+  "决定 AI 收益大小的第一变量可能不是任务不确定性、而是『代码库年龄/成熟度』，且与开发者资历无关：Denisov-Blanch 纵向研究发现，2x 产出提升几乎全部来自新代码库，遗留代码库收益很小，而这个差异在 individual contributor 和 principal engineer 之间高度一致——原文『The codebase itself was the bigger dividing line』。这给估算模型提供了一个基线没有的强预测变量：应先问『这是新代码库任务还是遗留代码库任务』，再问探索型/执行型。",
+  "Review 的性质正在从『对不对』转向『值不值』，这是一种更难自动化、也更难随经验分摊的判断类型：《3100 Opinions on Code Review in an AI World》(arXiv:2607.07980) 的因果理论指出，审查者现在要判断的主要不再是正确性（这部分可部分自动化），而是这个抽象是否值得、这个边缘情况的复杂度是否值得、团队半年后是否还愿意维护这段防御代码。这类判断天然是隐性知识密集型，随 PR 量增加时人均认知负荷不是持平而是上升。这暗示『可自动验证比例』本身有隐藏的成分上限：正确性可自动化，必要性/可维护性判断目前基本不能。",
+  "验证成本存在『被推迟而非被消除』的现象，会在生产环境反弹：Sonar 2026 调研显示96%开发者不完全信任 AI 代码，但只有48%『总是』在提交前验证；同期数据显示每 PR 事故率上升23.5%，另有数据称 Meta 内部约40%的生产环境调试时间源于 agent 基于不完整知识行动。团队实际上没有把 Validation 这一项足额花掉，而是系统性拖延到了生产事故阶段——提示基线的四数字模型可能需要拆出第五个字段：『延迟验证/生产尾部成本』，否则 Validation 数字会被系统性低估。",
+  "技术债务按『复利』增长、且已有具体拐点数据，不是一次性验证成本：一项对30万+条 AI 生成 commit 的研究发现未解决技术问题数从2025年初的数百条飙升到2026年2月的超过11万条；被多方转引的 GitClear 数据（未独立核实原始来源）称重构占比从2021年25%降到2024年不到10%、代码 churn 从5.5%升到7.9%。这意味着 Validation Cost 若只按单任务/单PR核算会系统性低估——真正的成本是未被验证的债务经过多轮迭代后复利爆发，这是基线完全没有建模的时间维度。",
+  "『可自动验证比例』不是静态天花板，而是可以被组织投入主动抬高的变量：GitHub 数据显示目前自动化审查只能省下30-50%人工时间，但 Denisov-Blanch 的案例显示当自动化审查量超过人工审查量后，公司整体吞吐仍能做到2.09x且合并率/回滚率保持稳定。这给基线#6提供了一个可操作杠杆：不只是『人的 review 带宽』要扩容，『自动验证比例』本身也可以被工程投入（更好的审查工具+流程再造）主动拉高，且已有实证案例支持这条路径可行。"
+ ],
+ "counter_points": [
+  "基线整个叙事的前提『AI 大幅压缩了编码工时』在 METR 的 RCT 里被直接证伪，至少在特定场景下成立：16名在自己熟悉的成熟开源代码库上工作的资深开发者，用 AI 完成任务反而慢19%而非变快。METR 自己也标注该结果为『特定场景/已过时』，所以不是全称判断，但足以让基线#5从『AI 大幅压缩 Implementation Cost』改写为『AI 只在 accident 占比高的任务（新代码库/样板代码/不熟悉领域）上压缩工时，在 essence 占比高的任务（自己熟悉的成熟系统里的判断型工作）上可能不压缩甚至拖慢』。",
+  "基线#9的『~2x整体提速』可能是乐观上限而非典型值：DORA 组织级交付指标持平、CircleCI 主干吞吐反而下降（成功率仅70.8%）的证据表明，把编码层面的 N 倍提速折算进包含 review/集成/生产稳定性的完整交付管道后，净效应在不少组织里可能趋近于0甚至为负，而不是稳定收敛在~2x。基线用 Amdahl 定律做对了方向判断（提速被摊薄），但『2x』这个具体锚点缺乏证据支持，实际分布可能从<1x到~2x都有，取决于组织有没有同步投资 review/集成能力。",
+  "基线把『人类瓶颈』(#3 Validation, #6 review带宽) 当作单一、均匀分布的资源池，但实证数据显示这个成本在团队内部高度不对称，且分布方式本身可能是坏消息：Xu et al. (arXiv:2510.10165) 发现 Copilot 引入后，生产力增量主要来自外围/初级开发者，返工/审查负担几乎全压在核心/资深开发者身上——他们原创代码产出下降19%、审查量上升6.5%。也就是说『验证成本』不能只按团队总带宽做加减法，它会向最稀缺、离职成本最高的少数资深人力集中；只按团队总 review 带宽估算，会系统性低估对核心人才的挤兑风险和团队可持续性风险。",
+  "『并行 agent 数=可自动验证比例×人 review 带宽』这个乘法模型隐含假设『可自动验证比例』是外生给定的常数，但一线证据显示这个比例现实值很低（GitHub 数据：自动化审查只能省下30-50%人工时间；行业调研：极少工程负责人对『AI代码部署后正确性』有『非常』信心），而且这个比例本身还会随 PR 体积/复杂度变化（PR 越大，可自动验证比例通常越低）。基线公式方向正确，但若把『可自动验证比例』当成固定输入而非随任务/代码库/PR大小变化的函数，很容易系统性高估可并行的 agent 数量上限。"
+ ],
+ "notable_quotes": [
+  "\"developers expected AI to speed them up by 24%... [in reality they were] 19% slower\" —— METR, 《Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity》, 2025-07-10",
+  "\"Your AI speedup is a measurement of how much of your job was accident.\" —— cekrem, 《There Is Still No Silver Bullet》",
+  "\"The bottleneck didn't disappear. It relocated from writing code to verifying it.\" —— dev.to (code-board), 《The Review Bottleneck: Why More AI Code Means Slower Teams in 2026》",
+  "\"AI makes it trivially easy to produce massive diffs. That doesn't mean reviewers can absorb them.\" —— dev.to (code-board), 同上",
+  "\"You can't compress the back-and-forth of 3 months of code review into 1.5 weeks… This simply cannot be done.\" —— Addy Osmani（转引 Colton Voege）,《The reality of AI-Assisted software engineering productivity》",
+  "\"the added rework burden falls on the more experienced (core) developers, who review 6.5% more code after Copilot's introduction, but show a 19% drop in their original code productivity\" —— Xu, Medappa, Tunc, Vroegindeweij & Fransoo, arXiv:2510.10165",
+  "\"The codebase itself was the bigger dividing line.\" —— Denisov-Blanch et al., arXiv:2607.01904（解释AI收益差异主要来自代码库新旧，而非开发者资历）",
+  "\"changes that are correct for the subset it analyzed and subtly broken for the rest\" —— TianPan.co,《AI Coding Agents on Legacy Codebases: What Works and What Backfires》，描述agent在大型单体架构中的跨服务失效模式"
+ ],
+ "sources": [
+  {
+   "title": "Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity",
+   "url": "https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/",
+   "author": "Joel Becker, Nate Rush, Beth Barnes, David Rein (METR)",
+   "date": "2025-07-10",
+   "kind": "report"
+  },
+  {
+   "title": "AI-Assisted Programming Decreases the Productivity of Experienced Developers by Increasing the Technical Debt and Maintenance Burden",
+   "url": "https://arxiv.org/abs/2510.10165",
+   "author": "Feiyang Xu, Poonacha K. Medappa, Murat M. Tunc, Martijn Vroegindeweij, Jan C. Fransoo",
+   "date": "2025-10",
+   "kind": "paper"
+  },
+  {
+   "title": "There Is Still No Silver Bullet",
+   "url": "https://cekrem.github.io/posts/there-is-still-no-silver-bullet/",
+   "author": "cekrem",
+   "date": "2025/2026",
+   "kind": "blog"
+  },
+  {
+   "title": "3100 Opinions on Code Review in an AI World: Building Causal Theory from Practitioner Discourse",
+   "url": "https://arxiv.org/abs/2607.07980",
+   "author": "(arXiv preprint)",
+   "date": "2026-07",
+   "kind": "paper"
+  },
+  {
+   "title": "The reality of AI-Assisted software engineering productivity",
+   "url": "https://addyo.substack.com/p/the-reality-of-ai-assisted-software",
+   "author": "Addy Osmani",
+   "date": "2025/2026",
+   "kind": "blog"
+  },
+  {
+   "title": "The Review Bottleneck: Why More AI Code Means Slower Teams in 2026",
+   "url": "https://dev.to/code-board/the-review-bottleneck-why-more-ai-code-means-slower-teams-in-2026-1e5n",
+   "author": "code-board",
+   "date": "2026",
+   "kind": "blog"
+  },
+  {
+   "title": "AI Writes Faster Than Humans Can Review: A Longitudinal Study of an Enterprise \"2×\" Mandate",
+   "url": "https://arxiv.org/abs/2607.01904",
+   "author": "Yegor Denisov-Blanch et al.",
+   "date": "2026-07",
+   "kind": "paper"
+  },
+  {
+   "title": "AI Coding Agents on Legacy Codebases: What Works and What Backfires",
+   "url": "https://tianpan.co/blog/2026-04-19-ai-coding-agents-brownfield-legacy-code",
+   "author": "TianPan",
+   "date": "2026-04-19",
+   "kind": "blog"
+  }
+ ]
+}
