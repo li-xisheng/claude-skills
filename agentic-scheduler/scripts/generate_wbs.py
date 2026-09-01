@@ -8,7 +8,10 @@
 规格:  见 references/wbs-rendering.md（JSON schema 与渲染规则）
 
 内置的既知坑位（勿改动除非重新验证）:
-- 条件格式 dxf 的填充必须用 bgColor（fgColor 会得到白字白底的隐身列）
+- 条件格式 dxf 的填充必须用 bgColor **且不要指定 patternType**
+  （出力は <patternFill><bgColor/></patternFill>。これが CF dxf の規範形。
+   solid を足すと fgColor 側が有効になり、未指定の fgColor のせいで
+   「白字・白背景の隠身列」になる——実測で踏んだ罠。指摘されても戻さないこと）
 - 当日红线用 CF 挂 TODAY()，打开文件自动追随；纯 CF 无单元格公式风险
 - 父行/分组行条形用 lightTrellis 格子纹，与叶子实心条区分（计数一致性）
 - 動的シート只用 2007 安全函数（IF/AND/COUNTIF/SUMPRODUCT/INDEX/MATCH/IFERROR/
@@ -160,7 +163,11 @@ def build(spec):
             while cur <= b:
                 i = (cur - start).days
                 if 0 <= i < ndays:
-                    ws.cell(r, COL0 + i).fill = (mesh if (grp or bold) else solid)[hexc]
+                    # 格子柄かどうかは grp（子を持つか）だけで決める。bold（＝階層が
+                    # トップレベル）を混ぜると、子を持たないトップレベル葉タスクが
+                    # 格子柄で描かれるのに「本日」では葉として数えられ、凡例
+                    #「格子柄＝親・グループ行、数えない」と矛盾する。
+                    ws.cell(r, COL0 + i).fill = (mesh if grp else solid)[hexc]
                     span.append(i)
                 cur += timedelta(1)
         for msd in t.get("milestones", []):
