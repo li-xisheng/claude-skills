@@ -10,7 +10,8 @@
 - 在用户**已登录**的系统里做诊断/检查（控制台、后台、内网系统的页面状态、接口返回）
 - 前端调试：console 报错、DOM/CSS 为什么没生效、网络请求失败
 - 审计：Lighthouse、可访问性（a11y）、性能 trace
-- **不适合**：无状态批量抓取、多账号隔离、验证码场景 → 通道 A（browser-act）；
+- **不适合**：不该沾用户登录态的抓取、批量并行、干净环境验证 → 通道 A（同一个包换
+  `--isolated`，见 [isolated-browser.md](isolated-browser.md)）；
   以用户身份做操作型日常代办（点击/填表/发内容）→ 优先通道 C（Claude in Chrome）
 
 ## 一次性前置（每台机器配一次）
@@ -50,7 +51,7 @@ MCP 写在 `~/.claude.json`（server 名 `chrome-devtools`）：
 | **1（默认）** | `--channel=stable --autoConnect` | ✅ 复用 | 首选。无机器专属路径，可移植 |
 | **2** | `--userDataDir <profile 绝对路径> --autoConnect` | ✅ 复用 | 第1档找不到 profile，或用非默认/多 profile。路径即 `chrome://version` 的「个人资料路径」去掉尾部 `\Default` |
 | **3** | `--browserUrl http://127.0.0.1:9222` | ✅ 复用 | 前两档都失败。需**手动**以 `chrome.exe --remote-debugging-port=9222` 启动 Chrome（得先完全退出，托盘也退干净），走的是老式固定端口握手 |
-| **4** | `--isolated`（可加 `--headless`） | ❌ 无 | 兜底。MCP 自开全新隔离实例，与用户 Chrome 无关。做无状态诊断/抓取仍可用；需登录的任务改走通道 A 或 C |
+| **4** | `--isolated`（可加 `--headless`） | ❌ 无 | 兜底。MCP 自开全新隔离实例，与用户 Chrome 无关。做无状态诊断/抓取仍可用；需登录的任务改走通道 C。**注意这一档本质上已经是通道 A**，长期要用就别改 B 的配置，另配一个 `chrome-isolated` 条目（见 [isolated-browser.md](isolated-browser.md)） |
 
 **命令行直接验证某一档**（不必改配置、不必重启）：
 
@@ -99,6 +100,10 @@ MCP 写在 `~/.claude.json`（server 名 `chrome-devtools`）：
   典型症状是 `args` 里只有 `--autoConnect`。按上文补 `--channel=stable`，重启 Claude Code。
   自查：`netstat -ano | findstr :9222` 无输出 + profile 目录下 `DevToolsActivePort` 里是别的端口
   → 就是这个问题（说明 Chrome 用的是新版随机端口机制，而 MCP 在敲 9222）。
+- **`args` 里是 `--wsEndpoint ws://127.0.0.1:<port>/devtools/browser/<GUID>`**：这是**一次性**的。
+  GUID 每次 Chrome 启动都变，端口在 Chrome 144+ 也是随机的，所以这份配置只在写下它的那次
+  Chrome 会话里有效，重启 Chrome 后必然连不上。当场调试可以这么用，**别留在 `~/.claude.json` 里**——
+  长期配置回到第 1 档 `--channel=stable --autoConnect`。
 - `/mcp` 显示未连接：确认已重启 Claude Code；`npx -y chrome-devtools-mcp@latest` 能联网拉包。
   另外检查 `args` 首项是否被误写成 `cmd` 之类的包装（应为 `command: "npx"`）。
 - 截图无反应/超时：检查 `chrome://inspect/#remote-debugging` 已开，且授权框点了允许；Chrome 版本 ≥144。
