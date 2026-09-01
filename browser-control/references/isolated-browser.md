@@ -14,7 +14,7 @@ B 是 `--autoConnect`（挂用户已登录的 Chrome），A 是 `--isolated`（�
 | 出品 | Google / Chrome DevTools 团队 |
 | 账号/密钥 | **不需要** |
 | 运行时 | node（本机 v22）+ 已装的 Chrome |
-| 出网 | 只有 npx 拉包；另有 `--usageStatistics` 默认开启，见下文安全节 |
+| 出网 | 只有 npx 拉包；另有两处默认开启的遥测，用 `--no-usage-statistics` / `--no-performance-crux` 关，见下文安全节 |
 
 ## 何时用这条通道
 
@@ -80,7 +80,7 @@ B 是 `--autoConnect`（挂用户已登录的 Chrome），A 是 `--isolated`（�
 - **等待时间要给够**。冷启动 = npx 拉包 + 全新 profile 首次启动 headless Chrome，
   实测超过 20 秒；`sleep 20 / timeout 60` 会在拿到结果前被砍掉，看起来像"没反应"。
 
-## 常用启动参数（`npx chrome-devtools-mcp@latest --help` 为准）
+## 常用启动参数（以 `npx -y chrome-devtools-mcp@latest --help` 的实际输出为准）
 
 | 参数 | 用途 |
 |---|---|
