@@ -1,6 +1,6 @@
 ---
 name: browser-control
-description: "浏览器操控统一入口，三条通道：A 隔离浏览器（chrome-devtools-mcp --isolated 自开一次性 profile，不碰登录态）、B 调试端口（同一个 MCP 用 --autoConnect 挂用户当前已登录 Chrome，DevTools 级调试）、C Claude in Chrome 插件（Anthropic 原生集成，以用户身份做日常代办）。三条全部开源免费、无账号无 API key。Use when: 抓 JS 渲染后的内容、批量/并行/无人值守抓取、用未登录视角看页面；或用户想让 AI 看/操作当前打开的浏览器——截当前页、查 console 错误、检查 DOM/CSS 为什么没生效、看网络请求/XHR、跑 Lighthouse 或 a11y 审计、录性能 trace；或在已登录站点里点击/填表/导航/整理标签页；或改完前端要在真实登录态下做可视化核对；或用户提到 chrome-devtools / autoConnect / isolated / Claude in Chrome / 连接我的浏览器 / 看我现在的页面。无状态纯文本抓取先用 WebFetch。"
+description: "浏览器操控统一入口，三条通道：A 隔离浏览器（chrome-devtools-mcp --isolated 自开一次性 profile，不碰登录态）、B 调试端口（同一个 MCP 用 --autoConnect 挂用户当前已登录 Chrome，DevTools 级调试）、C Claude in Chrome 插件（Anthropic 原生集成，以用户身份做日常代办，需已有的 claude.ai 订阅登录）。A/B 为同一个 Apache-2.0 的包，无账号无 API key；没有任何一条通道需要为浏览器能力向第三方注册或付费。Use when: 抓 JS 渲染后的内容、批量/并行/无人值守抓取、用未登录视角看页面；或用户想让 AI 看/操作当前打开的浏览器——截当前页、查 console 错误、检查 DOM/CSS 为什么没生效、看网络请求/XHR、跑 Lighthouse 或 a11y 审计、录性能 trace；或在已登录站点里点击/填表/导航/整理标签页；或改完前端要在真实登录态下做可视化核对；或用户提到 chrome-devtools / autoConnect / isolated / Claude in Chrome / 连接我的浏览器 / 看我现在的页面。无状态纯文本抓取先用 WebFetch。"
 metadata:
   author: westarlsc（自撰 chrome-devtools 说明书 + 隔离通道实测 + Claude in Chrome 调研）
   type: router + reference
