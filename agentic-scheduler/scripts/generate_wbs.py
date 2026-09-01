@@ -23,8 +23,6 @@ from openpyxl.styles.differential import DifferentialStyle
 from openpyxl.formatting.rule import Rule
 from openpyxl.utils import get_column_letter
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
-
 JP = "Yu Gothic"
 BAR = "5B9BD5"    # 実装・調査（濃青）
 SOFT = "BDD7EE"   # 検証・調整（薄青）
@@ -328,8 +326,13 @@ def _add_daily_sheets(wb, days, daily_rows, SL, EL, f_hdr, border):
 
 
 if __name__ == "__main__":
+    # 端末が cp932 でも日本語を出せるようにする。import 時ではなくここで行うのは、
+    # モジュールとして import された時（wbs-rendering.md の「python 側シミュレーション」
+    # による検証がこれに当たる）に呼び出し側の stdout を勝手に差し替えないため。
+    if hasattr(sys.stdout, "buffer"):
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
     if len(sys.argv) != 2:
-        print("usage: python generate_wbs.py spec.json")
+        print("usage: python scripts/generate_wbs.py spec.json")
         sys.exit(1)
     with open(sys.argv[1], encoding="utf-8") as f:
         spec = json.load(f)
