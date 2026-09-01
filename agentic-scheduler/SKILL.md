@@ -132,3 +132,4 @@ ETA 变化像 GPS 导航：有依据的修订是预测系统在正常工作，�
 | [references/derivation-record.md](references/derivation-record.md) | 被问「这条规则凭什么/推导过程能复核吗」时（推导链+8角度原始调查数据在 research/） |
 | [references/mechanisms.md](references/mechanisms.md) | 落地任何机制的操作细节：探测协议、校准、队列规则、状态文件模板 |
 | [references/external-layer.md](references/external-layer.md) | 出対外承诺文档、日本客户見積、被要求出 WBS 时、应对「为什么还要这么久」时 |
+| [references/wbs-rendering.md](references/wbs-rendering.md) | 实际生成 WBS Excel 时（scripts/generate_wbs.py 的用法与内置坑位） |
