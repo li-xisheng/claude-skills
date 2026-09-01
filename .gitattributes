@@ -1,0 +1,5 @@
+# eval 用のモック CLI などのシェルスクリプトは必ず LF で保存する。
+# CRLF が混入すると Linux / macOS で `bad interpreter: /usr/bin/env bash^M` となり
+# クローンした時点で実行できなくなる（Windows 側の autocrlf 設定に依存させない）。
+browser-control/evals/files/fetchkit text eol=lf
+*.sh text eol=lf
