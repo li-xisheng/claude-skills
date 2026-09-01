@@ -162,8 +162,22 @@ def build(spec):
                 c.font = Font(name=JP, size=9, bold=True, color="FFFFFF")
                 c.alignment = Alignment(horizontal="center", vertical="center")
                 span.append(i)
-        # 隠し列 + 本日フラグ（葉のみ）
+        # 隠し列は「開始〜終了の連続 1 区間」しか表現できない。バーが分断していたり
+        # ◆ がバー期間の外にあると、min/max の間の空白日まで「本日」対象に数えられ、
+        # 凡例（バー期間が本日を含む葉タスク）と食い違う workbook が黙って出来上がる。
+        # 直せないので spec 側で行を分けてもらう。
         if (not grp) and span:
+            uniq = sorted(set(span))
+            if uniq[-1] - uniq[0] + 1 != len(uniq):
+                holes = [start + timedelta(i)
+                         for i in range(uniq[0], uniq[-1] + 1) if i not in set(uniq)]
+                raise ValueError(
+                    "WBS {0}「{1}」: バー／◆ の期間が連続していません（空白日: {2}）。"
+                    "隠し列は連続 1 区間しか表せず、空白日まで「本日」対象に数えて"
+                    "しまいます。行を分けるか、◆ を独立した行にしてください。".format(
+                        w, t["name"].strip(),
+                        "、".join(x.strftime("%m/%d") for x in holes[:5])
+                        + ("…" if len(holes) > 5 else "")))
             ws.cell(r, cS, start + timedelta(min(span))).number_format = "m/d"
             ws.cell(r, cE, start + timedelta(max(span))).number_format = "m/d"
             daily_rows.append((r, start + timedelta(min(span)), start + timedelta(max(span))))
