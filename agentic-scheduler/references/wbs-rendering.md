@@ -76,7 +76,8 @@
 | 计数一致性 | 叶子实心条／父层格子纹（lightTrellis）；甘特条数＝●数＝清单件数 | 父子条同色时肉眼计数必然对不上 |
 | 「本日」列 ● | 叶子行公式 `IF(AND(開始<=TODAY(),終了>=TODAY()),"●","")` | 分组行必须留空，否则重复计数 |
 | 动态清单 | 隐藏列（開始/終了/連番）+ INDEX/MATCH；連番＝終了日昇順 rank（SUMPRODUCT，同日按行序破并列） | rank 不唯一则 MATCH 错位 |
-| 函数纪律 | 只用 IF/AND/COUNTIF/SUMPRODUCT/INDEX/MATCH/IFERROR/TODAY | FILTER/XLOOKUP/SORT 在 LibreOffice 算不出且 openpyxl 无 spill 元数据 |
+| 函数纪律 | 只用 IF/AND/COUNTIF/SUMPRODUCT/INDEX/MATCH/IFERROR/TODAY/ROW | FILTER/XLOOKUP/SORT 在 LibreOffice 算不出且 openpyxl 无 spill 元数据 |
+| 日别表名 | 跨年时才加年份（`%y%m%d`），否则 `%m%d` | 跨年用 `%m%d` 会撞名，openpyxl 会静默改成 `12301` 这种像日期又不是日期的名字 |
 | 表头 | 月合并/日/曜日三行、土日灰、freeze 在日列前、Yu Gothic | — |
 
 ## Recalc 注意

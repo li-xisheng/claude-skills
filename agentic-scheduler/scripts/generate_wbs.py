@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 """日本式 WBS＋日別ガント Excel 生成器（agentic-scheduler 附属）
 
-用法:  python generate_wbs.py spec.json
+用法:  python scripts/generate_wbs.py spec.json   （リポジトリ直下から）
 规格:  见 references/wbs-rendering.md（JSON schema 与渲染规则）
 
 内置的既知坑位（勿改动除非重新验证）:
 - 条件格式 dxf 的填充必须用 bgColor（fgColor 会得到白字白底的隐身列）
 - 当日红线用 CF 挂 TODAY()，打开文件自动追随；纯 CF 无单元格公式风险
 - 父行/分组行条形用 lightTrellis 格子纹，与叶子实心条区分（计数一致性）
-- 動的シート只用 2007 安全函数（IF/AND/COUNTIF/SUMPRODUCT/INDEX/MATCH/IFERROR/TODAY）
-  ——禁 FILTER/XLOOKUP/SORT（LibreOffice 不能算 + openpyxl 无 spill 元数据）
+- 動的シート只用 2007 安全函数（IF/AND/COUNTIF/SUMPRODUCT/INDEX/MATCH/IFERROR/
+  TODAY/ROW）——禁 FILTER/XLOOKUP/SORT（LibreOffice 不能算 + openpyxl 无 spill 元数据）
+- 日別シート名は跨年時のみ %y%m%d（%m%d だと 12/30 と翌年 12/30 が衝突し、
+  openpyxl が黙って "12301" のような紛らわしい名前に改名する）
 - 連番＝終了日昇順 rank（SUMPRODUCT，同日按行序破并列保证 MATCH 唯一）
 """
 import io
@@ -290,8 +292,14 @@ def _add_daily_sheets(wb, days, daily_rows, SL, EL, f_hdr, border):
     置くとスクリプト実行時にまだ定義されておらず、daily_sheets 指定で NameError になる。
     """
     WKND = PatternFill("solid", fgColor="F5E9E9")
+    # 跨年する計画では %m%d が衝突する（12/30 と翌年 12/30）。衝突すると openpyxl は
+    # 黙って "12301" のような日付に見えて日付でない名前に改名するので、跨年時だけ年を足す。
+    fmt = "%m%d" if days[0].year == days[-1].year else "%y%m%d"
+    if len(days) > 60:
+        print("warning: 日別シートを {} 枚作ります。タブが多すぎて実用に耐えない場合は "
+              "daily_sheets を外してください。".format(len(days)), file=sys.stderr)
     for i, day in enumerate(days):
-        t = wb.create_sheet(day.strftime("%m%d"), 1 + i)
+        t = wb.create_sheet(day.strftime(fmt), 1 + i)
         t.cell(1, 1, "{}/{}（{}）のタスク".format(day.month, day.day, YOBI[day.weekday()])).font = Font(name=JP, size=12, bold=True)
         t.cell(2, 1, "内容は WBS シートからの参照。行構成は計画時点のもの——計画を変えたら再生成する。").font = Font(name=JP, size=8, color="777777")
         for ci, h in enumerate(["#", "WBS", "タスク", "種別", "開始(目安)", "終了(目安)", "状態"], 1):
