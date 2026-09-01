@@ -51,7 +51,7 @@ MCP 写在 `~/.claude.json`（server 名 `chrome-devtools`）：
 | **1（默认）** | `--channel=stable --autoConnect` | ✅ 复用 | 首选。无机器专属路径，可移植 |
 | **2** | `--userDataDir <profile 绝对路径> --autoConnect` | ✅ 复用 | 第1档找不到 profile，或用非默认/多 profile。路径即 `chrome://version` 的「个人资料路径」去掉尾部 `\Default` |
 | **3** | `--browserUrl http://127.0.0.1:9222` | ✅ 复用 | 前两档都失败。需**手动**以 `chrome.exe --remote-debugging-port=9222` 启动 Chrome（得先完全退出，托盘也退干净），走的是老式固定端口握手 |
-| **4** | `--isolated`（可加 `--headless`） | ❌ 无 | 兜底。MCP 自开全新隔离实例，与用户 Chrome 无关。做无状态诊断/抓取仍可用；需登录的任务改走通道 C。**注意这一档本质上已经是通道 A**，长期要用就别改 B 的配置，另配一个 `chrome-isolated` 条目（见 [isolated-browser.md](isolated-browser.md)） |
+| **4** | `--isolated`（可加 `--headless`） | ❌ 无 | 兜底。MCP 自开全新隔离实例，与用户 Chrome 无关。做无状态诊断/抓取仍可用。**这一档没有登录态**，需要登录态的任务只能回到 1–3 档去 attach 用户 Chrome；通道 C 可用时（有插件 + claude.ai 订阅登录 + 非 WSL）也可改走 C，但别把它当成必然的退路。**注意这一档本质上已经是通道 A**，长期要用就别改 B 的配置，另配一个 `chrome-isolated` 条目（见 [isolated-browser.md](isolated-browser.md)） |
 
 **命令行直接验证某一档**（不必改配置、不必重启）：
 

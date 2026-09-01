@@ -60,8 +60,14 @@ B 是 `--autoConnect`（挂用户已登录的 Chrome），A 是 `--isolated`（�
  sleep 60) | timeout 100 npx -y chrome-devtools-mcp@latest --isolated --headless --no-page-id-routing 2>/dev/null | tail -c 2000
 ```
 
-2026-09-01 在 Windows + mcp 1.8.0 实测通过，返回
+2026-09-01 在 **Windows + Git Bash**（mcp 1.8.0）实测通过，返回
 `Successfully navigated to https://example.com. ## Pages 1: Example Domain [selected]`。
+
+> **这段脚本要在 bash 里跑**（Git Bash / WSL / macOS / Linux 均可）：它用的 `timeout`
+> 和 `sleep` 是 GNU coreutils 的。**PowerShell 和 cmd.exe 里直接照抄会失败**——
+> Windows 自带的 `timeout.exe` 是"暂停 N 秒"，不是"限时执行某命令"，语义完全不同。
+> 在这两个 shell 下要么改用 Git Bash，要么直接把 MCP 条目配好走工具调用。
+
 两个坑都是实测撞出来的，照抄别改小：
 
 - **`--no-page-id-routing` 不能省**。`--pageIdRouting` 默认 true，此时 `navigate_page`
