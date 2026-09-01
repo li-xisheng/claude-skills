@@ -5,7 +5,7 @@ metadata:
   author: westarlsc（自撰 chrome-devtools 说明书 + 隔离通道实测 + Claude in Chrome 调研）
   type: router + reference
   requires:
-    channel-a: "chrome-devtools-mcp --isolated（npx，无需安装；建议在 ~/.claude.json 另配一个 server 条目 chrome-isolated）"
+    channel-a: "chrome-devtools-mcp --isolated（npx -y chrome-devtools-mcp@latest --isolated --headless，无需预装；-y 不可省，否则 stdio 下会卡在 npx 的交互确认；建议在 ~/.claude.json 另配一个 server 条目 chrome-isolated）"
     channel-b: "chrome-devtools MCP（~/.claude.json 全局配置，npx -y chrome-devtools-mcp@latest --channel=stable --autoConnect，Chrome 144+）"
     channel-c: "Chrome『Claude』插件 v1.0.36+ + claude --chrome（需 claude.ai 订阅账号登录；API key/Bedrock 等渠道不可用；WSL 不支持）"
 ---
