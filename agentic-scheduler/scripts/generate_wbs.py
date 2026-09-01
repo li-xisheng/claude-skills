@@ -199,10 +199,11 @@ def build(spec):
         # 凡例（バー期間が本日を含む葉タスク）と食い違う workbook が黙って出来上がる。
         # 直せないので spec 側で行を分けてもらう。
         if (not grp) and span:
-            uniq = sorted(set(span))
+            covered = set(span)
+            uniq = sorted(covered)
             if uniq[-1] - uniq[0] + 1 != len(uniq):
                 holes = [start + timedelta(i)
-                         for i in range(uniq[0], uniq[-1] + 1) if i not in set(uniq)]
+                         for i in range(uniq[0], uniq[-1] + 1) if i not in covered]
                 raise ValueError(
                     "WBS {0}「{1}」: バー／◆ の期間が連続していません（空白日: {2}）。"
                     "隠し列は連続 1 区間しか表せず、空白日まで「本日」対象に数えて"
