@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """日本式 WBS＋日別ガント Excel 生成器（agentic-scheduler 附属）
 
-用法:  python scripts/generate_wbs.py spec.json   （リポジトリ直下から）
+用法:  python scripts/generate_wbs.py spec.json
+       パスはスキルディレクトリ基準。このリポジトリ（スキルの monorepo）で動かす
+       場合は先に `cd agentic-scheduler`。インストール済みスキルとして使う場合は
+       そのスキルディレクトリが基準になる。
 规格:  见 references/wbs-rendering.md（JSON schema 与渲染规则）
 
 内置的既知坑位（勿改动除非重新验证）:
@@ -53,8 +56,14 @@ def has_child(wbs, all_wbs):
 def build(spec):
     start = d(spec["start"])
     ndays = int(spec["days"])
-    days = [start + timedelta(i) for i in range(ndays)]
     tasks = spec["tasks"]
+    # 早期検証。ここを通すと R1 < R0 になって参照範囲が逆転し、openpyxl の奥から
+    # 「expected MultiCellRange」という spec の誤りを示唆しない例外が飛ぶ。
+    if ndays < 1:
+        raise ValueError('spec の "days" は 1 以上にしてください（現在: {}）。'.format(ndays))
+    if not tasks:
+        raise ValueError('spec の "tasks" が空です。最低 1 行必要です。')
+    days = [start + timedelta(i) for i in range(ndays)]
     all_wbs = [str(t["wbs"]) for t in tasks]
     n_rows = len(tasks)
     R0 = 4
@@ -354,7 +363,8 @@ if __name__ == "__main__":
     if hasattr(sys.stdout, "buffer"):
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
     if len(sys.argv) != 2:
-        print("usage: python scripts/generate_wbs.py spec.json")
+        print("usage: python scripts/generate_wbs.py spec.json"
+              "  (スキルディレクトリから。この monorepo では先に cd agentic-scheduler)")
         sys.exit(1)
     with open(sys.argv[1], encoding="utf-8") as f:
         spec = json.load(f)

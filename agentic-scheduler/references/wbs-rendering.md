@@ -16,6 +16,7 @@
    style=plan/verify、milestones 单日、kind/issue/dep/effort/目安文言；
    按需开 `task_dir`（任务详细 md 联动）和 `daily_sheets`（日别页）
 4. **生成**：`python scripts/generate_wbs.py spec.json`
+   （パスはスキルディレクトリ基準。このスキル monorepo で動かすなら先に `cd agentic-scheduler`）
    → WBS（表+日别甘特+当日红线+「本日」列）＋可选 日别页/本日页 ＋ 前提・凡例
 5. **task_dir 时补齐 tasks/**：每叶子一个 `<番号>.md`，**开头两节固定
    「全体にとっての意味」「核心」**（只有手顺的 md 不合格），另放 README 番号规约
@@ -60,7 +61,8 @@
 - `milestones`：日期数组，各画一个 ◆（当日才进「本日」判定）
 - `daily_sheets`（可选，true）：每个计划日生成一张日别 sheet（tab 名 `0827` 式），
   行内容全部 `=WBS!…` 引用主表——改主表即联动；成员/排序按计划静态落位，改计划→重新生成。
-  注意 tab 数=日数；与 today_sheet（本日のタスク）可并存也可二选一
+  注意 tab 数=日数。**「本日のタスク」表是恒生成的**（没有开关，也不与 daily_sheets 互斥）——
+  两者内容同源：日别表是计划时点的静态落位，「本日のタスク」按打开日动态取
 - `task_dir`（可选）：相对目录名（如 `"tasks"`）。指定后叶子行的 WBS 番号变成超链接
   → `<task_dir>/<番号>.md`——每条任务一个详细 md（やること/完了条件/範囲外/検証/変更履歴）
 - **父行/分组行自动识别**（存在 `X.` 开头的子行即视为分组）→ 条形自动转格子纹、
