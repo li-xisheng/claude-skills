@@ -19,7 +19,7 @@
 MCP 写在 `~/.claude.json`（server 名 `chrome-devtools`）：
 
 ```json
-{"command":"npx","args":["chrome-devtools-mcp@latest","--channel=stable","--autoConnect"]}
+{"command":"npx","args":["-y","chrome-devtools-mcp@latest","--channel=stable","--autoConnect"]}
 ```
 
 > **`--autoConnect` 必须搭配 `--channel` 或 `--userDataDir`，单独给不生效。**
@@ -105,7 +105,9 @@ MCP 写在 `~/.claude.json`（server 名 `chrome-devtools`）：
   Chrome 会话里有效，重启 Chrome 后必然连不上。当场调试可以这么用，**别留在 `~/.claude.json` 里**——
   长期配置回到第 1 档 `--channel=stable --autoConnect`。
 - `/mcp` 显示未连接：确认已重启 Claude Code；`npx -y chrome-devtools-mcp@latest` 能联网拉包。
-  另外检查 `args` 首项是否被误写成 `cmd` 之类的包装（应为 `command: "npx"`）。
+  另外检查 `args` 首项是否被误写成 `cmd` 之类的包装（应为 `command: "npx"`），
+  以及 `args` 里有没有 `-y`——缺了它且本机没预装包时，npx 会等一个交互确认
+  （*Ok to proceed?*），而 stdio 模式下没人回答，表现就是 server 一直连不上。
 - 截图无反应/超时：检查 `chrome://inspect/#remote-debugging` 已开，且授权框点了允许；Chrome 版本 ≥144。
 - 连不上想要的那个窗口：autoConnect 连的是当前活动 Chrome 实例；多 profile/多实例时只留目标实例开着。
 - **`list_pages` 只返回 `about:blank`**：连的是新开的隔离实例而非用户 Chrome。检查是否误用了
