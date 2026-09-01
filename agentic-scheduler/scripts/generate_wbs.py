@@ -56,6 +56,22 @@ def has_child(wbs, all_wbs):
     return any(o.startswith(wbs + ".") for o in all_wbs if o != wbs)
 
 
+def put(ws, r, c, v):
+    """spec 由来の値を書く（"=" 始まりが数式化するのを防ぐ）。
+
+    openpyxl は "=" で始まる文字列を数式（data_type="f"）として <f> に書く。
+    タスク名や備考が "=>" などで始まると意図せず数式になり、Excel で #NAME? になる。
+    実測: "+1+1" / "-" / "@foo" は data_type="s" のまま inlineStr で書かれるので、
+    CSV インジェクションのような接頭辞対策は xlsx では不要——危ないのは "=" だけ。
+    アポストロフィを足す対処は不可（openpyxl は Excel の UI と違って取り除かず、
+    セルに "'" が見えたまま残る）。data_type を上書きするのが正解。
+    """
+    cell = ws.cell(r, c, v)
+    if isinstance(v, str) and v.startswith("="):
+        cell.data_type = "s"
+    return cell
+
+
 def build(spec):
     start = d(spec["start"])
     ndays = int(spec["days"])
@@ -134,7 +150,7 @@ def build(spec):
                 t.get("dep", ""), t.get("effort", ""), t.get("start_note", ""),
                 t.get("end_note", ""), t.get("status", "未着手")]
         for i, v in enumerate(vals, 1):
-            c = ws.cell(r, i, v)
+            c = put(ws, r, i, v)
             c.font = Font(name=JP, size=10, bold=bold)
             c.border = border
             c.alignment = Alignment(vertical="center", wrap_text=(i == 2))
@@ -305,6 +321,10 @@ def build(spec):
         ws3.append(row)
     for row in ws3.iter_rows():
         for c in row:
+            # このシートに意図した数式は無い。spec 由来の title / notes が "=" 始まり
+            # だと append 経由で数式化するので、ここで文字列へ戻す（put と同じ理由）。
+            if c.data_type == "f":
+                c.data_type = "s"
             c.font = Font(name=JP, size=10)
             c.alignment = Alignment(vertical="center", wrap_text=True)
     ws3["A1"].font = Font(name=JP, size=12, bold=True)
