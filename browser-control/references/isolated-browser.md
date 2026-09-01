@@ -47,6 +47,11 @@ B 是 `--autoConnect`（挂用户已登录的 Chrome），A 是 `--isolated`（�
 - 通道 A → `mcp__chrome-isolated__*`
 - 通道 B → `mcp__chrome-devtools__*`
 
+**配好后第一次调用别直接 `navigate_page`。** 上面的配置保留了 `--pageIdRouting`
+默认开（并发时各任务不串页，值得留着），代价是页面级工具都要传 `pageId`——
+不传就是 `MCP error -32602: Required at pageId`，而这个报错不会告诉你去哪儿拿。
+顺序是先 `new_page` 或 `list_pages` 拿到 `pageId`，再带着它调用后续工具。
+
 **为什么必须配两个条目**：一个 MCP server 进程只能是一种连接模式，
 `--isolated` 和 `--autoConnect` 互斥。想在一个会话里既诊断用户页面又跑隔离抓取，就得两个进程。
 
