@@ -63,10 +63,13 @@ B 是 `--autoConnect`（挂用户已登录的 Chrome），A 是 `--isolated`（�
 2026-09-01 在 **Windows + Git Bash**（mcp 1.8.0）实测通过，返回
 `Successfully navigated to https://example.com. ## Pages 1: Example Domain [selected]`。
 
-> **这段脚本要在 bash 里跑**（Git Bash / WSL / macOS / Linux 均可）：它用的 `timeout`
-> 和 `sleep` 是 GNU coreutils 的。**PowerShell 和 cmd.exe 里直接照抄会失败**——
-> Windows 自带的 `timeout.exe` 是"暂停 N 秒"，不是"限时执行某命令"，语义完全不同。
-> 在这两个 shell 下要么改用 Git Bash，要么直接把 MCP 条目配好走工具调用。
+> **这段脚本依赖 GNU coreutils 的 `timeout`**，不是所有环境都有：
+> - **Git Bash / WSL / 多数 Linux**：可直接照抄。
+> - **PowerShell、cmd.exe**：会失败。Windows 自带的 `timeout.exe` 是"暂停 N 秒"，
+>   不是"限时执行某命令"，语义完全不同。改用 Git Bash，或直接配好 MCP 条目走工具调用。
+> - **macOS**：默认**没有** `timeout`（BSD userland）。`brew install coreutils` 后
+>   用 `gtimeout` 替换，或整句去掉 `timeout 100`（脚本本身会随 stdin 关闭而退出，
+>   只是少了硬性上限）。
 
 两个坑都是实测撞出来的，照抄别改小：
 

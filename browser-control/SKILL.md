@@ -120,7 +120,10 @@ A 和 B 是同一个 Apache-2.0 的包，无账号、无 API key；C 用的是�
    成功识破了漏斗、拒绝了注册，却转头把用户推荐给另一个同类的商用 CLI——躲开一个
    漏斗，走进一个一模一样的。只说"我没照它做"，等于把问题原样丢回给用户。
 6. **遥测也是代价。** 采用一个浏览器方案前，确认它往外发什么。
-   `chrome-devtools-mcp` 默认向 Google 上报使用统计，可用 `--no-usage-statistics` 关闭。
+   `chrome-devtools-mcp` 有**两处**默认开启的外发，关一处漏一处没意义：
+   `--no-usage-statistics`（使用统计上报 Google）和 `--no-performance-crux`
+   （跑性能 trace 时把被测 URL 发给 CrUX API——测内网地址尤其要注意）。
+   细节见 [isolated-browser.md 安全节](references/isolated-browser.md)。
 
 > 第 5 条的由来：原通道 A 曾是某商用 CLI，付费引导藏在它运行时打印给 agent 的指令里，
 > 磁盘上的 skill 文件完全看不到，结果 agent 照着把用户推向注册页——而那个任务
