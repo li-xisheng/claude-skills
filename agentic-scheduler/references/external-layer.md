@@ -91,7 +91,8 @@ Progressive Elaboration / Rolling Wave（近细远粗、随信息细化）同样
 **因此对传统派的说服话术不是「AI 时代不一样了」，而是「按正规项目管理理论本来就该这么做」**——
 很多公司实际执行的是 WBS+task list+工数表+Gantt 揉成一张 Excel 的变体，那不是 PMI 的 WBS。
 
-**渲染规则（做 WBS 时遵守）**：
+**渲染规则（做 WBS 时遵守；可执行版见 [wbs-rendering.md](wbs-rendering.md) +
+[scripts/generate_wbs.py](../scripts/generate_wbs.py)）**：
 1. 叶子按**成果物**切，不按活动拆到底
 2. **近细远粗**（Rolling Wave）：近 1-2 週详细，远期只到枝干，随信息追加细化
 3. 工数列只放目安+来源等级；**不做叶子合计→工期推导**（日期由マイルストーン+分位数持有）
