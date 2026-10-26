@@ -1,6 +1,6 @@
 ---
 name: openspec-propose
-description: Propose a new change with all artifacts generated in one step. Use when the user wants to quickly describe what they want to build and get a complete proposal with design, specs, and tasks ready for implementation.
+description: 'Propose a new change with all OpenSpec artifacts (proposal, specs, design, tasks) generated in one step. Use only when the project uses OpenSpec (an openspec/ directory exists, or the user mentions OpenSpec or a change proposal) and the user wants a complete proposal ready for implementation. Not for projects without OpenSpec - shape a vague idea with brainstorming, or write an agent brief with goal-engineer.'
 allowed-tools: Bash(openspec:*)
 license: MIT
 compatibility: Requires openspec CLI.

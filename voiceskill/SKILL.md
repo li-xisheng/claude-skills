@@ -1,6 +1,6 @@
 ---
 name: voiceskill
-description: Run local multilingual speech synthesis, reference-audio voice cloning, and speech recognition through Qwen3-TTS and Qwen3-ASR. Use whenever Codex needs to synthesize speech/audio, clone an authorized voice, transcribe audio/video, detect spoken language, or return word/character timestamps. Prefer the local APIs supplied by this skill instead of remote speech services.
+description: 'Run local multilingual speech synthesis, reference-audio voice cloning, and speech recognition through Qwen3-TTS and Qwen3-ASR. Use whenever you need to synthesize speech/audio, clone an authorized voice, transcribe audio/video, detect spoken language, or return word/character timestamps. Prefer the local APIs supplied by this skill instead of remote speech services.'
 ---
 
 # Voice Skill

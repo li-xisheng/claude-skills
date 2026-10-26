@@ -1,6 +1,6 @@
 ---
 name: ocrskill
-description: OCR workflow for local PDF/DOCX/PPTX and image-like document parsing with MinerU2.5-Pro. Use when Codex needs to OCR files or folders, convert DOCX/PPTX through LibreOffice or platform PDF converters, produce ezkotae v2 Markdown plus *_images.json outputs, crop detected image blocks into real files, generate DOCX, run MinerU/GLM-OCR style OCR, or expose/use a local OCR API.
+description: 'OCR workflow for local PDF/DOCX/PPTX and image-like document parsing with MinerU2.5-Pro. Use when you need to OCR files or folders, convert DOCX/PPTX through LibreOffice or platform PDF converters, produce ezkotae v2 Markdown plus *_images.json outputs, crop detected image blocks into real files, generate DOCX, run MinerU/GLM-OCR style OCR, or expose/use a local OCR API.'
 ---
 
 # OCR Skill
