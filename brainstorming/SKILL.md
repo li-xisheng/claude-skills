@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
+description: 'Use when an idea or feature request is still vague and must be co-designed with the user before any implementation - explores intent and constraints one question at a time, compares 2-3 designs, and produces an approved design doc. Do NOT use when the requirements are already clear: for a goal or brief an agent will execute use goal-engineer, for OpenSpec change artifacts use openspec-propose, for module or contract design use module-first, for schedules and ETAs use agentic-scheduler.'
 license: MIT
 metadata:
   author: Jesse Vincent (obra)
