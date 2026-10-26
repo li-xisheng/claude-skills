@@ -23,6 +23,7 @@ Personal collection of Claude Code skills. This is the primary/source-of-truth r
 | [agentic-scheduler](./agentic-scheduler/) | (westarlsc) AI/Agent Coding 时代的排程与交付预测。取代「任务数×人日」：regime 分类、探测优先、队列纪律（CONWIP/80%红线/20%应急块）、经验分位数 P50/P80/P95、决策日历，内部预测/运营看板/対外承诺三视图输出，附方法论定稿与三路检验留档 |
 | [module-first](./module-first/) | (westarlsc) 契约优先的模块化开发方法论。总纲「人的验证精力是唯一稀缺资源」：模块=变更单位、输入/输出契约+依赖声明、变更四级、验证三层、AI 产出缺陷处置（先复用→最小复现→换条件重写）、多 agent 并发派工判据，附按需升级表与首日清单。v0.4.0，评测迭代中，尚未部署到 ~/.claude/skills |
 | [voiceskill](./voiceskill/) | (westarlsc) 本地 Qwen3-TTS / Qwen3-ASR 多语言语音服务：参考音频声音克隆、自动语言检测及词/字级时间戳输出 |
+| [github-repo-search](./github-repo-search/) | (westarlsc，基于 yunshu0909 · yunshu_skillshub 的 github-repo-search 改写) GitHub 开源项目搜索，召回优先、不漏大项目。快速/标准/深挖三档；六路召回（已知头部清单、topic、短关键词、awesome 合集、网页搜索+`gh api` 回查星数、README 滚雪球）+ 重合度检查判断是否找全；按 ≥1000★ → 100–999★ → 10–99★ 分波下探，低星须过 6 项可用性验证；交付先回答「是否已有成熟方案」 |
 
 ## Usage
 
